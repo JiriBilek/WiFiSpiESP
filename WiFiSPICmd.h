@@ -86,7 +86,7 @@ class WiFiSpiEspCommandProcessor {
         static void cmdBeginUdpPacket();
         static void cmdInsertDatabuf();
         static void cmdSendDataUdp();
-
+        static void cmdUdpParsePacket();
 };
 
 // SPI Commands
@@ -130,6 +130,7 @@ enum {
   STOP_SERVER_TCP_CMD      = 0x3B,
   GET_SCANNED_DATA_CMD     = 0x3C,
   BEGIN_UDP_PACKET_CMD     = 0x3D,
+  UDP_PARSE_PACKET_CMD     = 0x3E,
 
   // All command with DATA_FLAG 0x40 send a 16bit Len
 

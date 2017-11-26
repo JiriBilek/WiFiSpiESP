@@ -166,3 +166,35 @@ void WiFiSpiEspCommandProcessor::cmdSendDataUdp() {
     replyEnd();
 }
 
+/*
+ * 
+ */
+void WiFiSpiEspCommandProcessor::cmdUdpParsePacket() {
+    uint8_t cmd = data[2];
+    
+    // Get and test the input parameter
+    if (data[3] != 1 || data[4] != 1 || data[6] != END_CMD) {
+        Serial.println(INVALID_MESSAGE_BODY);
+        return;  // Failure - received invalid message
+    }
+
+    uint8_t sock = data[5];
+    if (sock >= MAX_SOCK_NUM)
+        return;  // Invalid socket number
+
+    int16_t avail;
+    
+    if (serversUDP[sock] != NULL)
+        avail = serversUDP[sock]->parsePacket();
+    else
+        avail = 0;
+
+    #ifdef _DEBUG
+        Serial.printf("ParsePacket[%d] = %d\n", sock, avail);
+    #endif
+    
+    replyStart(cmd, 1);
+    replyParam(reinterpret_cast<const uint8_t *>(&avail), sizeof(avail));
+    replyEnd();
+}
+

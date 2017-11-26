@@ -1,2 +1,5 @@
+0.1.1 (2017-11-26)
+  * Fixed UDP communication
+
 0.1.0 (2017-03-14)
   * First version for testing

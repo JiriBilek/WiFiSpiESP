@@ -35,6 +35,12 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+/*
+  Version history:
+  0.1.0 15.03.17 JB  First version
+  0.1.1 25.11.17 JB  Fixed UDP protocol
+ */
+
 #include "SPISlave.h"
 #include "SPICalls.h"
 #include "WiFiSPICmd.h"
@@ -42,7 +48,7 @@
 #include <ESP8266WiFi.h>
 
 // Library version
-const char* VERSION = "0.1.0";
+const char* VERSION = "0.1.1";
 
 
 /*

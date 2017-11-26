@@ -164,7 +164,9 @@ void WiFiSpiEspCommandProcessor::processCommand(uint8_t *dataIn) {
         case SEND_DATA_UDP_CMD:
             cmdSendDataUdp();  break;
 
-
+        case UDP_PARSE_PACKET_CMD:
+            cmdUdpParsePacket();  break;
+            
         default:
             Serial.printf("Unknown command: %2x\n", cmd);
     }
