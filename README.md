@@ -14,7 +14,7 @@ The ESP8266 has two SPI interfaces. The first is connected to the flash memory, 
 ### Client library for Arduino AVR family
 
 While this project enables the SPI communication as a slave device, on master devices the corresponding library must be loaded.
-For Arduino AVR devices the library is *WifiSpi*.
+For Arduino AVR devices the library is [WifiSpi](https://github.com/JiriBilek/WiFiSpi).
 
 #### Wiring
 
