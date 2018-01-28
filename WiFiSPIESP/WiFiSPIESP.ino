@@ -12,6 +12,8 @@
 
     Note: If the ESP is booting at a moment when the SPI Master has the Select line HIGH (deselected)
     the ESP8266 WILL FAIL to boot!
+    
+    for OTA AVRISP support add connection from pin 4 (D2) to AVR reset pin
 
     Device to be compiled for: ESP8266
 
@@ -41,11 +43,25 @@
   0.1.1 25.11.17 JB  Fixed UDP protocol
  */
 
+//#define OTA_AVRISP
+
 #include "SPISlave.h"
 #include "SPICalls.h"
 #include "WiFiSPICmd.h"
 
 #include <ESP8266WiFi.h>
+
+#ifdef OTA_AVRISP
+#include <WiFiManager.h>
+#include <ESP8266mDNS.h>
+#include <SPI.h>
+#include <ESP8266AVRISP.h>
+
+const uint16_t port = 328;
+const uint8_t reset_pin = 4;
+
+ESP8266AVRISP avrprog(port, reset_pin);
+#endif
 
 // Library version
 const char* VERSION = "0.1.1";
@@ -56,13 +72,29 @@ const char* VERSION = "0.1.1";
  */
 void setup()
 {
+#ifndef OTA_AVRISP
     WiFi.persistent(false);  // Solving trap in ESP8266WiFiSTA.cpp#144 (wifi_station_ap_number_set)
                              // Relevant for version 2.3.0 of the board SDK software
                              // Erasing of flash memory might help: https://github.com/kentaylor/EraseEsp8266Flash/blob/master/EraseFlash.ino                
+#endif
     
     // Serial line for debugging
     Serial.begin(115200);
     Serial.setDebugOutput(true);
+
+#ifdef OTA_AVRISP
+    MDNS.begin("arduino");
+    MDNS.enableArduino(port);
+
+    WiFiManager wifiManager;
+    wifiManager.autoConnect();
+
+    // platform.txt:
+    // tools.avrdude.upload.network_pattern="{cmd.path}" "-C{config.path}" -p{build.mcu} -c{upload.protocol}
+    //          "-Pnet:{serial.port}:328" "-Uflash:w:{build.path}/{build.project_name}.with_bootloader.hex:i"
+    avrprog.begin();
+    avrprog.setReset(false); // let the AVR run
+#endif
 
     Serial.printf("\n\nSPI SLAVE ver. %s\n", VERSION);
 
@@ -122,5 +154,34 @@ void loop() {
         setRxStatus(SPISLAVE_RX_READY);
         dataReceived = false;
     }
+
+#ifdef OTA_AVRISP
+    static AVRISPState_t last_state = AVRISP_STATE_IDLE;
+    AVRISPState_t new_state = avrprog.update();
+    if (last_state != new_state) {
+        switch (new_state) {
+            case AVRISP_STATE_IDLE: {
+                Serial.printf("[AVRISP] now idle\r\n");
+                ESP.reset();
+                break;
+            }
+            case AVRISP_STATE_PENDING: {
+                Serial.printf("[AVRISP] connection pending\r\n");
+                SPISlave.end();
+                break;
+            }
+            case AVRISP_STATE_ACTIVE: {
+                Serial.printf("[AVRISP] programming mode\r\n");
+                // Stand by for completion
+                break;
+            }
+        }
+        last_state = new_state;
+    }
+    // Serve the client
+    if (last_state != AVRISP_STATE_IDLE) {
+        avrprog.serve();
+    }
+#endif
 }
 

@@ -75,6 +75,14 @@ void SPISlaveClass::begin()
     hspi_slave_onStatusSent(&_s_status_tx);
     hspi_slave_begin(4, this);
 }
+void SPISlaveClass::end()
+{
+    hspi_slave_onData(NULL);
+    hspi_slave_onDataSent(NULL);
+    hspi_slave_onStatus(NULL);
+    hspi_slave_onStatusSent(NULL);
+    hspi_slave_end();
+}
 void SPISlaveClass::setData(uint8_t * data, size_t len)
 {
     if(len > 32) {
