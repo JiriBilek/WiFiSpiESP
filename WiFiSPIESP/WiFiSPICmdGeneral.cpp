@@ -34,7 +34,7 @@ void WiFiSpiEspCommandProcessor::cmdGetFwVersion() {
     
     // Test the parameters
     if (data[3] != 0 || data[4] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -51,7 +51,7 @@ void WiFiSpiEspCommandProcessor::cmdGetMacAddr() {
     
     // Test the parameters
     if (data[3] != 0 || data[4] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
   
@@ -71,7 +71,7 @@ void WiFiSpiEspCommandProcessor::cmdSetIpConfig() {
     
     // Get and test the parameters (5 input parameters)
     if (data[3] != 5) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
     uint32_t local_ip, gateway, subnet, dns_server1, dns_server2;
@@ -90,7 +90,7 @@ void WiFiSpiEspCommandProcessor::cmdSetIpConfig() {
         return;  // Failure - received invalid parameter
 
     if (data[dataPos] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
     
@@ -111,12 +111,12 @@ void WiFiSpiEspCommandProcessor::cmdStartScanNetworks() {
     
     // Test the parameters
     if (data[3] != 0 || data[4] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
   
     int8_t resp = WiFi.scanNetworks(true, true);
-//Serial.printf("scanNetworks: %d\n", resp);
+
     replyStart(cmd, 1);
     replyParam(reinterpret_cast<const uint8_t*>(&resp), sizeof(resp));
     replyEnd();
@@ -130,12 +130,11 @@ void WiFiSpiEspCommandProcessor::cmdScanNetworks() {
     
     // Test the parameters
     if (data[3] != 0 || data[4] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
       
     int8_t resp = WiFi.scanComplete();
-//Serial.printf("scanComplete: %d\n", resp);
 
     replyStart(cmd, 1);
     replyParam(reinterpret_cast<const uint8_t*>(&resp), sizeof(resp));
@@ -150,7 +149,7 @@ void WiFiSpiEspCommandProcessor::cmdGetScannedData() {
     
     // Test the parameters
     if (data[3] != 1 || data[4] != 1 || data[6] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -159,7 +158,6 @@ void WiFiSpiEspCommandProcessor::cmdGetScannedData() {
     String ssid = WiFi.SSID(index);
     int32_t rssi = WiFi.RSSI(index);
     uint8_t encType = WiFi.encryptionType(index);
-//Serial.printf("%d: SSID=%s, RSSI=%ld, endType=%d\n", index, ssid.c_str(), rssi, encType);
 
     replyStart(cmd, 3);
     replyParam(reinterpret_cast<const uint8_t*>(ssid.c_str()), ssid.length());

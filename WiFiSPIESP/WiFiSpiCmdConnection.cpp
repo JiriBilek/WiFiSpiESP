@@ -30,7 +30,7 @@ void WiFiSpiEspCommandProcessor::cmdGetConnStatus() {
     
     // Test the parameters
     if (data[3] != 0 || data[4] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -49,7 +49,7 @@ void WiFiSpiEspCommandProcessor::cmdSetPassphrase() {
     
     // Get and test the parameters (2 input parameters)
     if (data[3] != 2) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
     char ssid[WL_SSID_MAX_LENGTH+1];
@@ -64,12 +64,12 @@ void WiFiSpiEspCommandProcessor::cmdSetPassphrase() {
         return;  // Failure - received invalid parameter
     
     if (data[dataPos] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
     #ifdef _DEBUG
-        Serial.printf("Wifi.begin, ssid=%s, passphrase=%s\n", ssid, passphrase);
+        Serial.printf("Wifi.begin, ssid=%s\n", ssid);
     #endif
 
     if (WiFi.status() == WL_CONNECTED) {
@@ -91,7 +91,7 @@ void WiFiSpiEspCommandProcessor::cmdSetNet() {
     
     // Get and test the parameter
     if (data[3] != 1) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
     
@@ -104,7 +104,7 @@ void WiFiSpiEspCommandProcessor::cmdSetNet() {
         return;  // Failure - received invalid parameter
     
     if (data[dataPos] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -130,7 +130,7 @@ void WiFiSpiEspCommandProcessor::cmdDisconnect() {
     
     // Test the parameters
     if (data[3] != 0 || data[4] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -149,7 +149,7 @@ void WiFiSpiEspCommandProcessor::cmdGetIpAddr() {
     
     // Test the parameters
     if (data[3] != 0 || data[4] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
     
@@ -177,7 +177,7 @@ void WiFiSpiEspCommandProcessor::cmdGetCurrSsid() {
     
     // Test the parameters
     if (data[3] !=0 || data[4] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
     
@@ -194,7 +194,7 @@ void WiFiSpiEspCommandProcessor::cmdGetCurrRssi() {
     
     // Test the parameters
     if (data[3] != 0 || data[4] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -213,7 +213,7 @@ void WiFiSpiEspCommandProcessor::cmdGetCurrBssid() {
     
     // Test the parameters
     if (data[3] != 0 || data[4] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
   
@@ -230,7 +230,7 @@ void WiFiSpiEspCommandProcessor::cmdGetHostByName() {
     
     // Test the parameters
     if (data[3] != 1) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -242,7 +242,7 @@ void WiFiSpiEspCommandProcessor::cmdGetHostByName() {
         return;  // Failure - received invalid parameter
         
     if (data[dataPos] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 

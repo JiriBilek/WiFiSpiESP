@@ -30,7 +30,7 @@ void WiFiSpiEspCommandProcessor::cmdStartServer() {
     
     // Get and test the parameters (3 input parameters)
     if (data[3] != 3) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
     uint16_t port;
@@ -50,7 +50,7 @@ void WiFiSpiEspCommandProcessor::cmdStartServer() {
         return;  // Invalid socket number
     
     if (data[dataPos] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -74,8 +74,6 @@ void WiFiSpiEspCommandProcessor::cmdStartServer() {
         status = serversUDP[sock]->begin(port);
     }
 
-//        Serial.printf("Status=%d\n", servers[sock]->status());
-    
     replyStart(cmd, 1);
     replyParam(&status, 1);
     replyEnd();
@@ -89,7 +87,7 @@ void WiFiSpiEspCommandProcessor::cmdGetStateTcp() {
     
     // Get and test the input parameter
     if (data[3] != 1 || data[4] != 1 || data[6] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -117,7 +115,7 @@ void WiFiSpiEspCommandProcessor::cmdStopServer() {
     
     // Get and test the input parameter
     if (data[3] != 1 || data[4] != 1 || data[6] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -139,7 +137,7 @@ void WiFiSpiEspCommandProcessor::cmdGetRemoteDataCmd() {
     
     // Get and test the input parameter
     if (data[3] != 1 || data[4] != 1 || data[6] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 

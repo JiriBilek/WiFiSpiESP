@@ -27,7 +27,7 @@
 #include "Arduino.h"
 
 // Prints out debugging information
-#define _DEBUG
+//#define _DEBUG
 // Prints out received and transmitted messages. Severely slows down the communication!
 //#define _DEBUG_MESSAGES
 

@@ -31,7 +31,7 @@ void WiFiSpiEspCommandProcessor::cmdBeginUdpPacket() {
     
     // Get and test the parameters (3 input parameters)
     if (data[3] != 3) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
     
@@ -52,7 +52,7 @@ void WiFiSpiEspCommandProcessor::cmdBeginUdpPacket() {
         return;  // Invalid socket number
     
     if (data[dataPos] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -82,7 +82,7 @@ void WiFiSpiEspCommandProcessor::cmdInsertDatabuf() {
     
     // Get and test the input parameter
     if (data[3] != 2 || data[4] != 1) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -95,7 +95,9 @@ void WiFiSpiEspCommandProcessor::cmdInsertDatabuf() {
     // Limit the length to 4000 characters
     // TODO: Remove the limit
     if (len > 4000) {
-        Serial.println(F("Too much data (>4000 bytes)."));
+        #ifdef _DEBUG
+            Serial.println(F("Too much data (>4000 bytes)."));
+        #endif
         return;  // Failure
     }
 
@@ -146,7 +148,7 @@ void WiFiSpiEspCommandProcessor::cmdSendDataUdp() {
     
     // Get and test the input parameter
     if (data[3] != 1 || data[4] != 1 || data[6] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -174,7 +176,7 @@ void WiFiSpiEspCommandProcessor::cmdUdpParsePacket() {
     
     // Get and test the input parameter
     if (data[3] != 1 || data[4] != 1 || data[6] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 

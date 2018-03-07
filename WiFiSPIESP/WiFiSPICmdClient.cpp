@@ -30,7 +30,7 @@ void WiFiSpiEspCommandProcessor::cmdStartClientTcp() {
     
     // Get and test the parameters (4 input parameters)
     if (data[3] != 4) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
     
@@ -54,7 +54,7 @@ void WiFiSpiEspCommandProcessor::cmdStartClientTcp() {
         return;  // Invalid socket number
     
     if (data[dataPos] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -79,7 +79,7 @@ void WiFiSpiEspCommandProcessor::cmdGetClientStateTcp() {
     
     // Get and test the input parameter
     if (data[3] != 1 || data[4] != 1 || data[6] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -109,7 +109,7 @@ void WiFiSpiEspCommandProcessor::cmdAvailDataTcp() {
     
     // Get and test the input parameter
     if (data[3] != 1 || data[4] != 1 || data[6] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -141,7 +141,7 @@ void WiFiSpiEspCommandProcessor::cmdSendDataTcp() {
     
     // Get and test the input parameter
     if (data[3] != 2 || data[4] != 1) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -154,7 +154,9 @@ void WiFiSpiEspCommandProcessor::cmdSendDataTcp() {
     // Limit the length to 4000 characters
     // TODO: Remove the limit
     if (len > 4000) {
-        Serial.println(F("Too much data (>4000 bytes)."));
+        #ifdef _DEBUG        
+            Serial.println(F("Too much data (>4000 bytes)."));
+        #endif        
         return;  // Failure
     }
     
@@ -201,7 +203,7 @@ void WiFiSpiEspCommandProcessor::cmdGetDataTcp() {
     
     // Get and test the input parameter
     if (data[3] != 2 || data[4] != 1 || data[6] != 1 || data[8] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -248,7 +250,7 @@ void WiFiSpiEspCommandProcessor::cmdGetDatabufTcp() {
     
     // Get and test the input parameter
     if (data[3] != 2 || data[4] != 1 || data[6] != 2 || data[9] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 
@@ -273,8 +275,6 @@ void WiFiSpiEspCommandProcessor::cmdGetDatabufTcp() {
     else
         len = serversUDP[sock]->read(buffer, len);
 
-//        Serial.printf("client.read: %d\n", len);
-    
     replyStart(cmd, 1);
     replyParam16(buffer, len);
     replyEnd();
@@ -290,7 +290,7 @@ void WiFiSpiEspCommandProcessor::cmdStopClientTcp() {
     
     // Get and test the input parameter
     if (data[3] != 1 || data[4] != 1 || data[6] != END_CMD) {
-        Serial.println(INVALID_MESSAGE_BODY);
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
         return;  // Failure - received invalid message
     }
 

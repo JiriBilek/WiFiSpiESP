@@ -39,6 +39,8 @@
   Version history:
   0.1.0 15.03.17 JB  First version
   0.1.1 25.11.17 JB  Fixed UDP protocol
+  0.1.2 28.03.18 JB  Fixed crash when comes an invalid message
+                     Removed some unnecessary debug printing from non-debug build
  */
 
 #include "SPISlave.h"
@@ -48,7 +50,7 @@
 #include <ESP8266WiFi.h>
 
 // Library version
-const char* VERSION = "0.1.1";
+const char* VERSION = "0.1.2";
 
 
 /*
@@ -62,7 +64,10 @@ void setup()
     
     // Serial line for debugging
     Serial.begin(115200);
+
+#ifdef _DEBUG    
     Serial.setDebugOutput(true);
+#endif
 
     Serial.printf("\n\nSPI SLAVE ver. %s\n", VERSION);
 
@@ -114,6 +119,13 @@ void loop() {
         memcpy(dataBuf, inputBuffer, 32);
 //        xt_wsr_ps(savedPS);  // sei();
 
+#ifdef _DEBUG    
+/*        Serial.print("gotData ");
+            for (uint8_t i=0; i<32; ++i)
+                Serial.printf("%02x ", dataBuf[i]);
+        Serial.println();  */
+#endif        
+     
 //delay(5);  // TODO: delete, only for debugging to slow down the processing
 
         WiFiSpiEspCommandProcessor::processCommand(dataBuf);
