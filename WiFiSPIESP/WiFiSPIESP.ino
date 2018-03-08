@@ -41,7 +41,11 @@
   0.1.1 25.11.17 JB  Fixed UDP protocol
   0.1.2 28.03.18 JB  Fixed crash when comes an invalid message
                      Removed some unnecessary debug printing from non-debug build
+  0.1.3          JB  Added WifiManager (configurable)
  */
+
+// This define adds WifiManager to the project (optional) (see https://github.com/tzapu/WiFiManager)
+//#define WIFIMANAGER_ENABLED
 
 #include "SPISlave.h"
 #include "SPICalls.h"
@@ -49,29 +53,44 @@
 
 #include <ESP8266WiFi.h>
 
-// Library version
-const char* VERSION = "0.1.2";
+#ifdef WIFIMANAGER_ENABLED
+    #include <WiFiManager.h>
+#endif
 
+// Library version
+const char* VERSION = "0.1.3";
+// Protocol version
+const char* PROTOCOL_VERSION = "0.1.1";
 
 /*
  * Setup
  */
 void setup()
 {
-    WiFi.persistent(false);  // Solving trap in ESP8266WiFiSTA.cpp#144 (wifi_station_ap_number_set)
-                             // Relevant for version 2.3.0 of the board SDK software
-                             // Erasing of flash memory might help: https://github.com/kentaylor/EraseEsp8266Flash/blob/master/EraseFlash.ino                
-    
     // Serial line for debugging
     Serial.begin(115200);
 
-#ifdef _DEBUG    
+#ifdef _DEBUG    // _DEBUG can be enabled in SPISlave.h
     Serial.setDebugOutput(true);
 #endif
 
-    Serial.printf("\n\nSPI SLAVE ver. %s\n", VERSION);
+    Serial.printf("\n\nSPI SLAVE ver. %s\nProtocol ver. %s\n", VERSION, PROTOCOL_VERSION);
 
+    WiFi.mode(WIFI_OFF);  // The Wifi is started either by the WifiManager or by user invoking "begin"
 
+    #ifdef WIFIMANAGER_ENABLED
+        WiFi.persistent(true);
+        Serial.println(F("WifiManager enabled."));
+
+        WiFiManager wifiManager;
+        wifiManager.autoConnect();
+
+    #else
+        WiFi.persistent(false);  // Solving trap in ESP8266WiFiSTA.cpp#144 (wifi_station_ap_number_set)
+                                 // Relevant for version 2.3.0 of the board SDK software
+                                 // Erasing of flash memory might help: https://github.com/kentaylor/EraseEsp8266Flash/blob/master/EraseFlash.ino                
+    #endif
+    
     // --- Setting callbacks for SPI protocol
 
     // --- onData

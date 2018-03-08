@@ -75,7 +75,9 @@ void WiFiSpiEspCommandProcessor::cmdSetPassphrase() {
     if (WiFi.status() == WL_CONNECTED) {
         disconnect();  // Needed, without disconnecting the WiFi.begin fails
     }
-            
+    
+    WiFi.mode(WIFI_OFF); 
+    WiFi.mode(WIFI_STA); 
     uint8_t status = WiFi.begin(ssid, passphrase);
 
     replyStart(cmd, 1);
