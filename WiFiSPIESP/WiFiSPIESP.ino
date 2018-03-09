@@ -57,9 +57,9 @@
     #include <WiFiManager.h>
 #endif
 
-// Library version
+// Library version (format a.b.c)
 const char* VERSION = "0.1.3";
-// Protocol version
+// Protocol version (format a.b.c) 
 const char* PROTOCOL_VERSION = "0.1.1";
 
 /*

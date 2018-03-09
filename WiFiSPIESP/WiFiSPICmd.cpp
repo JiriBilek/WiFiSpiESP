@@ -56,6 +56,7 @@ void WiFiSpiEspCommandProcessor::processCommand(uint8_t *dataIn) {
     // Decode the buffer
     if ((data[0] != MESSAGE_FINISHED && data[0] != MESSAGE_CONTINUES) || data[1] != START_CMD) {
         Serial.println(FPSTR(INVALID_MESSAGE_HEADER));
+
         return;  // Failure - received invalid message
    }
 
@@ -83,7 +84,12 @@ void WiFiSpiEspCommandProcessor::processCommand(uint8_t *dataIn) {
         case GET_SCANNED_DATA_CMD:
             cmdGetScannedData();  break;
 
+        case SOFTWARE_RESET_CMD:
+            cmdSoftwareReset();  break;
     
+        case GET_PROTOCOL_VERSION_CMD:
+            cmdGetProtocolVersion();  break;
+
         // ----- CONNECTION COMMANDS
 
         case GET_CONN_STATUS_CMD:

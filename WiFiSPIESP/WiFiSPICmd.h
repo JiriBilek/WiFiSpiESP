@@ -55,6 +55,8 @@ class WiFiSpiEspCommandProcessor {
         static void cmdStartScanNetworks();
         static void cmdScanNetworks();
         static void cmdGetScannedData();
+        static void cmdSoftwareReset();
+        static void cmdGetProtocolVersion();
 
         // WiFiSPICmdConnection.cpp
         static void cmdGetConnStatus();
@@ -131,8 +133,11 @@ enum {
   GET_SCANNED_DATA_CMD     = 0x3C,
   BEGIN_UDP_PACKET_CMD     = 0x3D,
   UDP_PARSE_PACKET_CMD     = 0x3E,
+  SOFTWARE_RESET_CMD       = 0x3F,
 
-  // All command with DATA_FLAG 0x40 send a 16bit Len
+  GET_PROTOCOL_VERSION_CMD = 0x50,
+
+  // All commands with DATA_FLAG 0x40 send a 16bit Len
 
   SEND_DATA_TCP_CMD        = 0x44,
   GET_DATABUF_TCP_CMD      = 0x45,

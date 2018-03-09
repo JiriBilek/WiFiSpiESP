@@ -24,6 +24,8 @@
 
 // Library version
 extern const char* VERSION;
+// Protocol version
+extern const char* PROTOCOL_VERSION;
 
 
 /*
@@ -163,6 +165,43 @@ void WiFiSpiEspCommandProcessor::cmdGetScannedData() {
     replyParam(reinterpret_cast<const uint8_t*>(ssid.c_str()), ssid.length());
     replyParam(reinterpret_cast<const uint8_t*>(&rssi), sizeof(rssi));
     replyParam(&encType, sizeof(encType));
+    replyEnd();
+}
+
+/*
+ * 
+ */
+void WiFiSpiEspCommandProcessor::cmdSoftwareReset() {
+    uint8_t cmd = data[2];
+
+    // Test the parameters
+    if (data[3] != 0 || data[4] != END_CMD) {
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
+        return;  // Failure - received invalid message
+    }
+
+    replyStart(cmd, 0);
+    replyEnd();
+
+    // Wait 500 ms for sending the reply and reset
+    delay(500);
+    ESP.restart();
+}
+
+/*
+ * 
+ */
+void WiFiSpiEspCommandProcessor::cmdGetProtocolVersion() {
+    uint8_t cmd = data[2];
+    
+    // Test the parameters
+    if (data[3] != 0 || data[4] != END_CMD) {
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
+        return;  // Failure - received invalid message
+    }
+
+    replyStart(cmd, 1);
+    replyParam((uint8_t*)PROTOCOL_VERSION, 5);
     replyEnd();
 }
 
