@@ -42,6 +42,7 @@
   0.1.2 28.03.18 JB  Fixed crash when comes an invalid message
                      Removed some unnecessary debug printing from non-debug build
   0.1.3          JB  Added WifiManager (configurable)
+  0.1.4 31.10.18 JB  Fixed bad timing of MISO signal - delayed by 1/2 clock cycle
  */
 
 // This define adds WifiManager to the project (optional) (see https://github.com/tzapu/WiFiManager)
@@ -58,7 +59,7 @@
 #endif
 
 // Library version (format a.b.c)
-const char* VERSION = "0.1.3";
+const char* VERSION = "0.1.4";
 // Protocol version (format a.b.c) 
 const char* PROTOCOL_VERSION = "0.1.1";
 
