@@ -2,13 +2,13 @@
     ESP8266 SPI Slave for WiFi connection with Arduino
     Connect the SPI Master device to the following pins on the esp8266:
 
-            ESP8266         |
-    GPIO    NodeMCU   Name  |   Uno
-  ===================================
-     15       D8       SS   |   D10
-     13       D7      MOSI  |   D11
-     12       D6      MISO  |   D12
-     14       D5      SCK   |   D13
+            ESP8266         |        |
+    GPIO    NodeMCU   Name  |   Uno  | STM32F103
+  ===============================================
+     15       D8       SS   |   D10  |    PA4
+     13       D7      MOSI  |   D11  |    PA7
+     12       D6      MISO  |   D12  |    PA6
+     14       D5      SCK   |   D13  |    PA5
 
     Note: If the ESP is booting at a moment when the SPI Master has the Select line HIGH (deselected)
     the ESP8266 WILL FAIL to boot!
@@ -59,9 +59,9 @@
 #endif
 
 // Library version (format a.b.c)
-const char* VERSION = "0.1.4";
+const char* VERSION = "0.2.0";
 // Protocol version (format a.b.c) 
-const char* PROTOCOL_VERSION = "0.1.1";
+const char* PROTOCOL_VERSION = "0.2.0";
 
 /*
  * Setup
