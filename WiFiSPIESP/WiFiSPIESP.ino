@@ -63,6 +63,8 @@ const char* VERSION = "0.2.0";
 // Protocol version (format a.b.c) 
 const char* PROTOCOL_VERSION = "0.2.0";
 
+const uint8_t SS_ENABLE_PIN = 5;  // PIN for circuit blocking SS to GPIO15 on reset 
+
 /*
  * Setup
  */
@@ -78,6 +80,9 @@ void setup()
     Serial.printf("\n\nSPI SLAVE ver. %s\nProtocol ver. %s\n", VERSION, PROTOCOL_VERSION);
 
     WiFi.mode(WIFI_OFF);  // The Wifi is started either by the WifiManager or by user invoking "begin"
+
+    pinMode(SS_ENABLE_PIN, OUTPUT);
+    digitalWrite(SS_ENABLE_PIN, HIGH);  // enable SS signal to GPIO15 (https://github.com/JiriBilek/WiFiSpiESP/issues/6)
 
     #ifdef WIFIMANAGER_ENABLED
         WiFi.persistent(true);
