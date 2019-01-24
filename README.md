@@ -22,13 +22,13 @@ The library uses hardware SPI on Arduino so most of the signals are fixed to cer
 
 The wiring is as follows:
 
-     Name  |   Uno   |      ESP8266
-           |         |  GPIO    NodeMCU
-    -------+---------+-----------------
-      SS   |   D10   |   15       D8
-     MOSI  |   D11   |   13       D7
-     MISO  |   D12   |   12       D6
-     SCK   |   D13   |   14       D5
+     PIN   |   Uno   | STM32F103C8 |     ESP8266
+     Name  |         |  SPI1 SPI2  |  GPIO    NodeMCU
+    -------+---------+---------------------------------
+      SS   |   D10   |  PA4  PB12  |   15       D8
+     MOSI  |   D11   |  PA7  PB15  |   13       D7
+     MISO  |   D12   |  PA6  PB14  |   12       D6
+     SCK   |   D13   |  PA5  PB13  |   14       D5
 
 Please be careful, the ESP8266 chip ports are **NOT** 5V tolerant, if you're connecting to a 5V device you have to use a level converter.
 
