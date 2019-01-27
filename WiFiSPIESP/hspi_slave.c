@@ -24,9 +24,9 @@
 
 static void (*_hspi_slave_rx_data_cb)(void * arg, uint8_t * data, uint8_t len) = NULL;
 static void (*_hspi_slave_tx_data_cb)(void * arg) = NULL;
-static void (*_hspi_slave_rx_status_cb)(void * arg, uint32_t data) = NULL;
+static void (*_hspi_slave_rx_status_cb)(void * arg, uint16_t data) = NULL;
 static void (*_hspi_slave_tx_status_cb)(void * arg) = NULL;
-static uint8_t _hspi_slave_buffer[33];
+static uint32_t _hspi_slave_buffer[8];
 
 void ICACHE_RAM_ATTR _hspi_slave_isr_handler(void *arg)
 {
@@ -49,22 +49,14 @@ void ICACHE_RAM_ATTR _hspi_slave_isr_handler(void *arg)
             _hspi_slave_tx_status_cb(arg);
         }
         if((status & SPISWSIS) != 0 && (_hspi_slave_rx_status_cb)) {
-            uint32_t s = SPI1WS;
+            uint16_t s = (SPI1WS & 0xffff);
             _hspi_slave_rx_status_cb(arg, s);
         }
         if((status & SPISWBIS) != 0 && (_hspi_slave_rx_data_cb)) {
-            uint8_t i;
-            uint32_t data;
-
-            _hspi_slave_buffer[32] = 0;
-            for(i=0; i<8; i++) {
-                data=SPI1W(i);
-                _hspi_slave_buffer[i<<2] = data & 0xff;
-                _hspi_slave_buffer[(i<<2)+1] = (data >> 8) & 0xff;
-                _hspi_slave_buffer[(i<<2)+2] = (data >> 16) & 0xff;
-                _hspi_slave_buffer[(i<<2)+3] = (data >> 24) & 0xff;
+            for(uint8_t i = 0; i < 8; i++) {
+                _hspi_slave_buffer[i] = SPI1W(i);
             }
-            _hspi_slave_rx_data_cb(arg, &_hspi_slave_buffer[0], 32);
+            _hspi_slave_rx_data_cb(arg, (uint8_t*)(&_hspi_slave_buffer[0]), 32);
         }
     } else if(istatus & (1 << SPII0)) { //SPI0 ISR
         SPI0S &= ~(0x3ff);//clear SPI ISR
@@ -93,13 +85,13 @@ void hspi_slave_begin(uint8_t status_len, void * arg)
     SPI1S1 = (((status_len * 8) - 1) << SPIS1LSTA) | (0xff << SPIS1LBUF) | (7 << SPIS1LWBA) | (7 << SPIS1LRBA) | SPIS1RSTA;
     SPI1P = (1 << 19);
     SPI1CMD = SPIBUSY;
-    SPI1C2 = (0x1<<SPIC2MISODM_S);  // delays MISO by 1/2 clock cycle. With the help of Günter Ackermann.
+    SPI1C2 = (0x1<<SPIC2MISODM_S);  // delays MISO by 1/2 clock cycle. With the help of GÃ¼nter Ackermann.
 
     ETS_SPI_INTR_ATTACH(_hspi_slave_isr_handler,arg);
     ETS_SPI_INTR_ENABLE();
 }
 
-void ICACHE_RAM_ATTR hspi_slave_setStatus(uint32_t status)
+void ICACHE_RAM_ATTR hspi_slave_setStatus(uint16_t status)
 {
     SPI1WS = status;
 }
@@ -133,7 +125,7 @@ void hspi_slave_onDataSent(void (*txd_cb)(void *))
     _hspi_slave_tx_data_cb = txd_cb;
 }
 
-void hspi_slave_onStatus(void (*rxs_cb)(void *, uint32_t))
+void hspi_slave_onStatus(void (*rxs_cb)(void *, uint16_t))
 {
     _hspi_slave_rx_status_cb = rxs_cb;
 }

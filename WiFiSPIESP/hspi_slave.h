@@ -27,7 +27,7 @@
 void hspi_slave_begin(uint8_t status_len, void * arg);
 
 //set the status register so the master can read it
-void hspi_slave_setStatus(uint32_t status);
+void hspi_slave_setStatus(uint16_t status);
 
 //set the data registers (max 32 bytes at a time)
 void hspi_slave_setData(uint8_t *data, uint8_t len);
@@ -35,7 +35,7 @@ void hspi_slave_setData(uint8_t *data, uint8_t len);
 //set the callbacks
 void hspi_slave_onData(void (*rxd_cb)(void *, uint8_t *, uint8_t));
 void hspi_slave_onDataSent(void (*txd_cb)(void *));
-void hspi_slave_onStatus(void (*rxs_cb)(void *, uint32_t));
+void hspi_slave_onStatus(void (*rxs_cb)(void *, uint16_t));
 void hspi_slave_onStatusSent(void (*txs_cb)(void *));
 
 #endif

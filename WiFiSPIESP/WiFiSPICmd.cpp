@@ -57,6 +57,12 @@ void WiFiSpiEspCommandProcessor::processCommand(uint8_t *dataIn) {
     if ((data[0] != MESSAGE_FINISHED && data[0] != MESSAGE_CONTINUES) || data[1] != START_CMD) {
         Serial.println(FPSTR(INVALID_MESSAGE_HEADER));
 
+    #ifdef _DEBUG
+        for (uint8_t i=0; i<32; ++i)
+            Serial.printf("%02x ", data[i]);
+        Serial.println(); 
+    #endif
+
         return;  // Failure - received invalid message
    }
 

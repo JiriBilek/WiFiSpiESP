@@ -5,6 +5,15 @@ This application is intended to run on ESP8266 module with accessible HSPI inter
 
 The application implements custom SPI protocol on HSPI interface of ESP8266 module and enables to use it as a dedicated WiFi slave device - see below. The SPI interface is used because of its strictly master/slave nature.
 
+## News
+
+#### 2019-01-27
+
+Enhanced communications protocol (added CRC-8 and confirmation of message reception). Shortened the status message from 4 bytes to 2 bytes and added XOR check. The protocol version is now 0.2.0 and is incompatible with the former one.
+
+Verified and supported the reset circuit ensuring proper reset of ESP8266 [(more here)](https://github.com/JiriBilek/WiFiSpiESP/issues/6).
+
+
 ## Requirements
 
 ### ESP8266 device
@@ -14,7 +23,7 @@ The ESP8266 has two SPI interfaces. The first is connected to the flash memory, 
 ### Client library for Arduino AVR family
 
 While this project enables the SPI communication as a slave device, on master devices the corresponding library must be loaded.
-For Arduino AVR devices the library is [WifiSpi](https://github.com/JiriBilek/WiFiSpi).
+For Arduino AVR devices the library is [WiFiSpi](https://github.com/JiriBilek/WiFiSpi).
 
 #### Wiring
 
@@ -29,6 +38,8 @@ The wiring is as follows:
      MOSI  |   D11   |  PA7  PB15  |   13       D7
      MISO  |   D12   |  PA6  PB14  |   12       D6
      SCK   |   D13   |  PA5  PB13  |   14       D5
+
+If you are using a reset circuit for proper signals on reset, use GPIO5 as SS_EN output.
 
 Please be careful, the ESP8266 chip ports are **NOT** 5V tolerant, if you're connecting to a 5V device you have to use a level converter.
 

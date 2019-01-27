@@ -40,6 +40,7 @@ uint8_t replyPos;
 // Local prototypes
 void writeByte(uint8_t byte);
 void flush(uint8_t indicator);
+uint8_t crc8(uint8_t *buffer, uint8_t bufLen);
 
 /*
    Event: onStatus
@@ -49,9 +50,9 @@ void flush(uint8_t indicator);
    The status register is a special register that both the slave and the master can write to and read from.
    Can be used to exchange small data or status information
 */
-void ICACHE_RAM_ATTR SPIOnStatus(uint32_t data) {
+void ICACHE_RAM_ATTR SPIOnStatus(uint16_t data) {
     #ifdef _DEBUG_SPICALLS
-        Serial.printf("Status: %08lx", data);
+        Serial.printf("Status: %04x\n", data);
     #endif
 }
 
@@ -66,6 +67,15 @@ void ICACHE_RAM_ATTR SPIOnStatusSent() {
     #ifdef _DEBUG_SPICALLS
         Serial.println(F("Status Sent"));
     #endif
+
+    // querying status after transmitting data confirms the data
+    uint32_t savedPS = noInterrupts();  // cli();
+    if ((SPISlaveState & 0x0f) == SPISLAVE_TX_WAITING_FOR_CONFIRM) {
+        dataSent = true;
+        setTxStatus(SPISLAVE_TX_NODATA);
+    }
+
+    xt_wsr_ps(savedPS);  // sei();
 }
 
 
@@ -74,7 +84,8 @@ void ICACHE_RAM_ATTR SPIOnStatusSent() {
    CALLED FROM INTERRUPT
 
    Data has been received from the master. Beware that len is always 32
-   and the buffer is autofilled with zeroes if data is less than 32 bytes long
+   and the buffer is autofilled with zeroes if data is less than 31 bytes long
+   The 32nd byte is crc8.
 
    Cmd Struct Message:
    __________________________________________________________________________________
@@ -85,13 +96,23 @@ void ICACHE_RAM_ATTR SPIOnStatusSent() {
 */
 void ICACHE_RAM_ATTR SPIOnData(uint8_t* data, size_t len) {
 
-  // TODO: Fix buffer overwriting when the processing of the buffer is too slow
+    // TODO: Fix buffer overwriting when the processing of the buffer is too slow
   
     uint32_t savedPS = noInterrupts();  // cli();
 
-    dataReceived = true;
-    setRxStatus(SPISLAVE_RX_BUSY);
-    inputBuffer = data;
+    // Check the CRC
+    setRxStatus(SPISLAVE_RX_CRC_PROCESSING);
+
+    if (data[31] == crc8(data, 31)) {
+        // CRC ok
+        dataReceived = true;
+        setRxStatus(SPISLAVE_RX_BUSY);
+        inputBuffer = data;
+    }
+    else {
+        // Bad CRC, ignore the message
+        setRxStatus(SPISLAVE_RX_ERROR);
+    }
 
     xt_wsr_ps(savedPS);  // sei();
 }
@@ -107,8 +128,7 @@ void ICACHE_RAM_ATTR SPIOnData(uint8_t* data, size_t len) {
 void ICACHE_RAM_ATTR SPIOnDataSent() {
     uint32_t savedPS = noInterrupts();  // cli();
     
-    dataSent = true;
-    setTxStatus(SPISLAVE_TX_NODATA);
+    setTxStatus(SPISLAVE_TX_WAITING_FOR_CONFIRM);
 
     xt_wsr_ps(savedPS);  // sei();
 
@@ -125,7 +145,7 @@ void ICACHE_RAM_ATTR setRxStatus(uint8_t stateRx) {
 
     SPISlaveState = (SPISlaveState & 0x0f) | (stateRx << 4);
         
-    uint32_t data = SPISlaveState << 24;
+    uint16_t data = SPISlaveState | ((SPISlaveState ^ 0xff) << 8);
     SPISlave.setStatus(data);  // Return indicator of the slave state
 
 //    xt_wsr_ps(savedPS);
@@ -139,7 +159,7 @@ void ICACHE_RAM_ATTR setTxStatus(uint8_t stateTx) {
 
     SPISlaveState = (SPISlaveState & 0xf0) | stateTx;
         
-    uint32_t data = SPISlaveState << 24;
+    uint16_t data = SPISlaveState | ((SPISlaveState ^ 0xff) << 8);
     SPISlave.setStatus(data);  // Return indicator of the slave state
 
 //    xt_wsr_ps(savedPS);
@@ -179,7 +199,7 @@ void replyEnd() {
 }
 
 void writeByte(const uint8_t b) {
-    if (replyPos >= 31) {
+    if (replyPos >= 30) {
         // Buffer full - send it now
         flush(MESSAGE_CONTINUES);
     }
@@ -195,6 +215,13 @@ void flush(uint8_t indicator) {
     // Message indicator
     reply[0] = indicator;
 
+    // Pad the data with zeros
+    while (replyPos < 30)
+        reply[++replyPos] = 0;
+
+    // CRC
+    reply[31] = crc8(reply, 31);
+
     // Debugging printout
     #ifdef _DEBUG_MESSAGES
         // Debugging printout
@@ -207,15 +234,15 @@ void flush(uint8_t indicator) {
     #endif
 
     // Wait until the previous message was sent
-    uint32_t maxtime = (millis() & 0x0fffffff) + 1000;
+    uint32_t thisTime = millis();
 
-    while (!dataSent && (maxtime > (millis() & 0x0fffffff)));
+    while (!dataSent && (millis() - thisTime < 1000));
 
     // Send the buffer
     uint32_t savedPS = noInterrupts();  // cli();
 
     dataSent = false;
-    SPISlave.setData(reply, replyPos+1);
+    SPISlave.setData(reply);
     setTxStatus(SPISLAVE_TX_READY);
 
     xt_wsr_ps(savedPS);  // sei();
@@ -231,8 +258,8 @@ void flush(uint8_t indicator) {
 int16_t readByte(uint8_t* data, uint8_t &dataPos) {
     uint8_t b = data[dataPos++];
 
-    // Check the buffer
-    if (dataPos >= 32) {
+    // Check the buffer (only 31 bytes available, 32th byte is the crc8)
+    if (dataPos >= 31) {
         if (data[0] != MESSAGE_CONTINUES)
             return -1;  // Error: No more data
 
@@ -241,9 +268,9 @@ int16_t readByte(uint8_t* data, uint8_t &dataPos) {
         data[0] = 0;  // invalidate the rx buffer (to be sure it wouldn't be read twice)
         setRxStatus(SPISLAVE_RX_READY);
 
-        uint32_t maxtime = (millis() & 0x0fffffff) + MSG_RECEIVE_TIMEOUT;
+        uint32_t thisTime = millis();
 
-        while (maxtime > (millis() & 0x0fffffff)) {
+        while (millis() - thisTime < MSG_RECEIVE_TIMEOUT) {
             if (dataReceived) {
                 // Get the data
                 uint32_t savedPS = noInterrupts();  // cli();
@@ -338,3 +365,28 @@ int8_t getParameterString(uint8_t* data, uint8_t &dataPos, char* param, const ui
     return len;
 }
 
+/*
+ * Compute crc8 with polynom 0x107 (x^8 + x^2 + x + 1)
+ * Lookup table idea: https://lentz.com.au/blog/tag/crc-table-generator
+ *
+ * INVESTIGATION: Doesn't the crc computing take too long to be processed in interrupt handler?
+ */
+uint8_t ICACHE_RAM_ATTR crc8(uint8_t *buffer, uint8_t bufLen)
+{
+    const static uint8_t POLY = 0x07;
+
+    static const uint8_t PROGMEM tableLow[] = { 0x00, 0x07, 0x0E, 0x09, 0x1C, 0x1B, 0x12, 0x15, 
+                                                0x38, 0x3F, 0x36, 0x31, 0x24, 0x23, 0x2A, 0x2D };
+    static const uint8_t PROGMEM tableHigh[] = { 0x00, 0x70, 0xE0, 0x90, 0xC7, 0xB7, 0x27, 0x57,
+                                                 0x89, 0xF9, 0x69, 0x19, 0x4E, 0x3E, 0xAE, 0xDE };
+
+    uint8_t crcValue = 0x00;
+
+    for (int i = 0; i < bufLen; ++i) {
+        crcValue ^= buffer[i];
+        crcValue = pgm_read_byte(tableLow + (crcValue & 0x0f)) ^ 
+                   pgm_read_byte(tableHigh +((crcValue >> 4) & 0x0f));
+    }
+
+    return crcValue;
+}

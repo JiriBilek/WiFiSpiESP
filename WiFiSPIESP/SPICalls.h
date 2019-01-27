@@ -58,18 +58,21 @@ int8_t getParameterString(uint8_t* data, uint8_t &dataPos, char* param, const ui
 // SPI Events
 void SPIOnData(uint8_t* data, size_t len);
 void SPIOnDataSent();
-void SPIOnStatus(uint32_t data);
+void SPIOnStatus(uint16_t data);
 void SPIOnStatusSent();
 
 // SPI Status
 enum {
     SPISLAVE_RX_BUSY,
-    SPISLAVE_RX_READY
+    SPISLAVE_RX_READY,
+    SPISLAVE_RX_CRC_PROCESSING,
+    SPISLAVE_RX_ERROR
 };
 enum {
     SPISLAVE_TX_NODATA,
     SPISLAVE_TX_READY,
-    SPISLAVE_TX_PREPARING_DATA
+    SPISLAVE_TX_PREPARING_DATA,
+    SPISLAVE_TX_WAITING_FOR_CONFIRM
 };
 
 // Command start and end flags

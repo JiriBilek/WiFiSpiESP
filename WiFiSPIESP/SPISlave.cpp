@@ -32,7 +32,7 @@ void ICACHE_RAM_ATTR SPISlaveClass::_data_rx(uint8_t * data, uint8_t len)
         _data_cb(data, len);
     }
 }
-void ICACHE_RAM_ATTR SPISlaveClass::_status_rx(uint32_t data)
+void ICACHE_RAM_ATTR SPISlaveClass::_status_rx(uint16_t data)
 {
     if(_status_cb) {
         _status_cb(data);
@@ -54,7 +54,7 @@ void ICACHE_RAM_ATTR SPISlaveClass::_s_data_rx(void *arg, uint8_t * data, uint8_
 {
     reinterpret_cast<SPISlaveClass*>(arg)->_data_rx(data,len);
 }
-void ICACHE_RAM_ATTR SPISlaveClass::_s_status_rx(void *arg, uint32_t data)
+void ICACHE_RAM_ATTR SPISlaveClass::_s_status_rx(void *arg, uint16_t data)
 {
     reinterpret_cast<SPISlaveClass*>(arg)->_status_rx(data);
 }
@@ -73,7 +73,7 @@ void SPISlaveClass::begin()
     hspi_slave_onDataSent(&_s_data_tx);
     hspi_slave_onStatus(&_s_status_rx);
     hspi_slave_onStatusSent(&_s_status_tx);
-    hspi_slave_begin(4, this);
+    hspi_slave_begin(2, this);  // status 2 bytes
 }
 void SPISlaveClass::setData(uint8_t * data, size_t len)
 {
@@ -82,7 +82,7 @@ void SPISlaveClass::setData(uint8_t * data, size_t len)
     }
     hspi_slave_setData(data, len);
 }
-void ICACHE_RAM_ATTR SPISlaveClass::setStatus(uint32_t status)
+void ICACHE_RAM_ATTR SPISlaveClass::setStatus(uint16_t status)
 {
     hspi_slave_setStatus(status);
 }
@@ -94,7 +94,7 @@ void SPISlaveClass::onDataSent(void (*cb)(void))
 {
     _data_sent_cb = cb;
 }
-void SPISlaveClass::onStatus(void (*cb)(uint32_t status))
+void SPISlaveClass::onStatus(void (*cb)(uint16_t status))
 {
     _status_cb = cb;
 }
