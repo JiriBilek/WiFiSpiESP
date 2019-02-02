@@ -38,6 +38,7 @@ extern uint8_t* inputBuffer;
 // Prototypes
 void setRxStatus(uint8_t state);
 void setTxStatus(uint8_t state);
+void refreshStatus();
 
 void replyStart(const uint8_t cmd, const uint8_t numParams);
 void replyParam(const uint8_t* param, const uint8_t paramLen);
