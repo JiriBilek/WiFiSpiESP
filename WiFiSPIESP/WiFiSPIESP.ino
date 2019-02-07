@@ -43,6 +43,7 @@
                      Removed some unnecessary debug printing from non-debug build
   0.1.3          JB  Added WifiManager (configurable)
   0.1.4 31.10.18 JB  Fixed bad timing of MISO signal - delayed by 1/2 clock cycle
+  0.2.0 01.02.19 JB  New communication protocol, more changes
  */
 
 // This define adds WifiManager to the project (optional) (see https://github.com/tzapu/WiFiManager)
@@ -159,5 +160,6 @@ void loop() {
         setRxStatus(SPISLAVE_RX_READY);
         dataReceived = false;
     }
+    else
+        refreshStatus();  // Helps to stabilize the SPI bus after a reset, only ensures the status register value is ok
 }
-

@@ -144,9 +144,7 @@ void ICACHE_RAM_ATTR setRxStatus(uint8_t stateRx) {
 //    uint32_t savedPS = noInterrupts();
 
     SPISlaveState = (SPISlaveState & 0x0f) | (stateRx << 4);
-        
-    uint16_t data = SPISlaveState | ((SPISlaveState ^ 0xff) << 8);
-    SPISlave.setStatus(data);  // Return indicator of the slave state
+    refreshStatus();        
 
 //    xt_wsr_ps(savedPS);
 }
@@ -158,11 +156,17 @@ void ICACHE_RAM_ATTR setTxStatus(uint8_t stateTx) {
 //    uint32_t savedPS = noInterrupts();
 
     SPISlaveState = (SPISlaveState & 0xf0) | stateTx;
+    refreshStatus();        
         
+//    xt_wsr_ps(savedPS);
+}
+
+/*
+    Puts status data into the status register
+ */
+void ICACHE_RAM_ATTR refreshStatus() {
     uint16_t data = SPISlaveState | ((SPISlaveState ^ 0xff) << 8);
     SPISlave.setStatus(data);  // Return indicator of the slave state
-
-//    xt_wsr_ps(savedPS);
 }
 
 /*
@@ -174,6 +178,8 @@ void replyStart(const uint8_t cmd, const uint8_t numParams) {
     reply[3] = numParams;  // number of params
 
     replyPos = 3;
+
+    dataSent = true;  // discard previous message (when master sends a new command it is clear it does not care about a previous one)
 }
 
 void replyParam(const uint8_t* param, const uint8_t paramLen) {
