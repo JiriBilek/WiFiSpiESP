@@ -33,9 +33,7 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
 
-/*
   Version history:
   0.1.0 15.03.17 JB  First version
   0.1.1 25.11.17 JB  Fixed UDP protocol
@@ -44,6 +42,7 @@
   0.1.3          JB  Added WifiManager (configurable)
   0.1.4 31.10.18 JB  Fixed bad timing of MISO signal - delayed by 1/2 clock cycle
   0.2.0 01.02.19 JB  New communication protocol, more changes
+  0.2.1 06.02.19 GYC  WifiManager: added LED blinking
  */
 
 // This define adds WifiManager to the project (optional) (see https://github.com/tzapu/WiFiManager)
@@ -57,20 +56,50 @@
 
 #ifdef WIFIMANAGER_ENABLED
     #include <WiFiManager.h>
+    #include <Ticker.h>                       
 #endif
 
 // Library version (format a.b.c)
-const char* VERSION = "0.2.0";
+const char* VERSION = "0.2.1";
 // Protocol version (format a.b.c) 
 const char* PROTOCOL_VERSION = "0.2.0";
 
 const uint8_t SS_ENABLE_PIN = 5;  // PIN for circuit blocking SS to GPIO15 on reset 
+
+#ifdef WIFIMANAGER_ENABLED
+Ticker ticker;  // for status LED
+
+void tick()
+{
+    //toggle state
+    int state = digitalRead(LED_BUILTIN);  // get the current state of LED
+    digitalWrite(LED_BUILTIN, !state);     // set pin to the opposite state
+}
+
+// Gets called when WiFiManager enters configuration mode
+void configModeCallback(WiFiManager *myWiFiManager)
+{
+    //Serial.println("Entered config mode");
+    //Serial.println(WiFi.softAPIP());
+    //if you used auto generated SSID, print it
+    //Serial.println(myWiFiManager->getConfigPortalSSID());
+    // entered config mode, make led toggle faster
+    ticker.attach(1, tick);
+}
+#endif
 
 /*
  * Setup
  */
 void setup()
 {
+#ifdef WIFIMANAGER_ENABLED
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH); // turn led off
+    // start ticker with 0.15 because we start in AP mode and try to connect
+    ticker.attach(0.15, tick);
+#endif
+
     // Serial line for debugging
     Serial.begin(115200);
 
@@ -90,7 +119,15 @@ void setup()
         Serial.println(F("WifiManager enabled."));
 
         WiFiManager wifiManager;
+        
+        // set callback that gets called when connecting to previous WiFi fails, and enters Access Point mode
+        wifiManager.setAPCallback(configModeCallback);
+        // connect
         wifiManager.autoConnect();
+
+        // connected successfully
+        ticker.detach();
+        digitalWrite(LED_BUILTIN, HIGH); // turn led off
 
     #else
         WiFi.persistent(false);  // Solving trap in ESP8266WiFiSTA.cpp#144 (wifi_station_ap_number_set)
@@ -152,8 +189,6 @@ void loop() {
         Serial.println();  */
 #endif        
      
-//delay(5);  // TODO: delete, only for debugging to slow down the processing
-
         WiFiSpiEspCommandProcessor::processCommand(dataBuf);
 
         // First enable the receiver and then enable the code in loop()

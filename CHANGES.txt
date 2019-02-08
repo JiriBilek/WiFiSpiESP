@@ -1,3 +1,9 @@
+0.2.1
+  * Blinking the builtin LED while in WifiManager mode and connecting
+  
+0.2.0
+  * New protocol, several new commands
+
 0.1.4 (2018-01-24)
   * Added protocol versioning
   * Added command for protocol version querying and soft reset
