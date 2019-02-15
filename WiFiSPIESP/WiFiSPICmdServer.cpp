@@ -145,15 +145,15 @@ void WiFiSpiEspCommandProcessor::cmdGetRemoteDataCmd() {
     if (sock >= MAX_SOCK_NUM)
         return;  // Invalid socket number
 
-    uint32_t ipAddr;
-    uint16_t port;
+    uint32_t ipAddr = 0;
+    uint16_t port = 0;
     
     if (serversUDP[sock] != NULL) {
         ipAddr = serversUDP[sock]->remoteIP();  // UDP connection
         port = serversUDP[sock]->remotePort();
-    } else {
-        ipAddr = clients[sock].remoteIP();  // TCP connection (server or client)
-        port = clients[sock].remotePort();
+    } else if (clients[sock] != NULL) {
+        ipAddr = clients[sock]->remoteIP();  // TCP connection (server or client)
+        port = clients[sock]->remotePort();
     }
 
     #ifdef _DEBUG

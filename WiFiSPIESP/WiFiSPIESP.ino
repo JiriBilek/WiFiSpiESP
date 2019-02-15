@@ -60,7 +60,7 @@
 #endif
 
 // Library version (format a.b.c)
-const char* VERSION = "0.2.1";
+const char* VERSION = "0.2.2";
 // Protocol version (format a.b.c) 
 const char* PROTOCOL_VERSION = "0.2.0";
 

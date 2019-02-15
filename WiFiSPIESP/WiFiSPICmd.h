@@ -35,7 +35,7 @@ class WiFiSpiEspCommandProcessor {
         // Private constant strings
         static const char INVALID_MESSAGE_HEADER[] PROGMEM;  // "Invalid message header - message rejected."
         static const char INVALID_MESSAGE_BODY[] PROGMEM;    // "Invalid message body - message rejected."
-        static WiFiClient clients[MAX_SOCK_NUM];
+        static WiFiClient *clients[MAX_SOCK_NUM];
         static WiFiServer *servers[MAX_SOCK_NUM];
         static WiFiUDP *serversUDP[MAX_SOCK_NUM];
 

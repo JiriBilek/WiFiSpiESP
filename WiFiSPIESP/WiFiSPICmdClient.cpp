@@ -64,7 +64,14 @@ void WiFiSpiEspCommandProcessor::cmdStartClientTcp() {
         Serial.printf("WifiClient.connect, sock=%d, ip=%s, port=%d\n", sock, IPAddress(ipAddr).toString().c_str(), port);
     #endif
 
-    uint8_t status = clients[sock].connect(IPAddress(ipAddr), port);
+    uint8_t status = 0;
+    if (clients[sock] != NULL) {
+        clients[sock]->stop();
+        delete clients[sock];
+    }
+
+    clients[sock] = new WiFiClient();
+    status = clients[sock]->connect(IPAddress(ipAddr), port);
 
     replyStart(cmd, 1);
     replyParam(&status, 1);
@@ -87,13 +94,25 @@ void WiFiSpiEspCommandProcessor::cmdGetClientStateTcp() {
     if (sock >= MAX_SOCK_NUM)
         return;  // Invalid socket number
     
-    uint8_t status = clients[sock].connected();  // 1 = connected
+    uint8_t status = 0;
+    if (clients[sock] != NULL)
+        status = clients[sock]->connected();  // 1 = connected
 
     // Is it a call of a closed client created in a server connection? 
     // Check if the server has connection
     if (! status && servers[sock] != NULL) {
-        clients[sock] = servers[sock]->available(NULL);
-        status = clients[sock].connected();  // 1 = connected
+        if (clients[sock] != NULL) {
+            clients[sock]->stop();
+
+            delete clients[sock];
+            clients[sock] = NULL;
+        }
+
+        WiFiClient client = servers[sock]->available(NULL);
+        status = client.connected();  // 1 = connected
+        if (status) {
+            clients[sock] = new WiFiClient(client);  // make a new client only when connected
+        }
     }
     
     replyStart(cmd, 1);
@@ -117,10 +136,11 @@ void WiFiSpiEspCommandProcessor::cmdAvailDataTcp() {
     if (sock >= MAX_SOCK_NUM)
         return;  // Invalid socket number
 
-    int16_t avail;
+    int16_t avail = 0;
     
     if (serversUDP[sock] == NULL)
-        avail = clients[sock].available();  // TCP
+        if (clients[sock] != NULL)
+            avail = clients[sock]->available();  // TCP
     else
         avail = serversUDP[sock]->available();  // UDP 
 
@@ -187,7 +207,10 @@ void WiFiSpiEspCommandProcessor::cmdSendDataTcp() {
         *buf++ = b;
     }
 
-    len = clients[sock].write(static_cast<const uint8_t*>(buffer), len);
+    if (clients[sock] != NULL)
+        len = clients[sock]->write(static_cast<const uint8_t*>(buffer), len);
+    else
+        len = 0;
     free(buffer);
 
     replyStart(cmd, 1);
@@ -214,10 +237,11 @@ void WiFiSpiEspCommandProcessor::cmdGetDataTcp() {
     uint8_t peek = data[7];
     
     int16_t reply = -1;
-    int16_t avail;
+    int16_t avail = 0;
 
     if (serversUDP[sock] == NULL)
-        avail = clients[sock].available();  // TCP
+        if (clients[sock] != NULL)
+            avail = clients[sock]->available();  // TCP
     else
         avail = serversUDP[sock]->available();  // UDP 
 
@@ -226,12 +250,12 @@ void WiFiSpiEspCommandProcessor::cmdGetDataTcp() {
          
         if (peek) {
             if (serversUDP[sock] == NULL)
-                reply = clients[sock].peek();
+                reply = clients[sock]->peek();
             else
                 reply = serversUDP[sock]->peek();
         } else {
             if (serversUDP[sock] == NULL)
-                reply = clients[sock].read();
+                reply = clients[sock]->read();
             else
                 reply = serversUDP[sock]->read();
         }
@@ -271,7 +295,10 @@ void WiFiSpiEspCommandProcessor::cmdGetDatabufTcp() {
 
     // Read the data into the buffer
     if (serversUDP[sock] == NULL)
-        len = clients[sock].read(buffer, len);
+        if (clients[sock] != NULL)
+            len = clients[sock]->read(buffer, len);
+        else
+            len = 0;  // no data
     else
         len = serversUDP[sock]->read(buffer, len);
 
@@ -298,7 +325,12 @@ void WiFiSpiEspCommandProcessor::cmdStopClientTcp() {
     if (sock >= MAX_SOCK_NUM)
         return;  // Invalid socket number
     
-    clients[sock].stop();
+    if (clients[sock] != NULL) {
+        clients[sock]->stop();
+
+        delete clients[sock];
+        clients[sock] = NULL;
+    }
 
     uint8_t status = 0;
     replyStart(cmd, 1);

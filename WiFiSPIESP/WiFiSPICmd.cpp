@@ -31,7 +31,7 @@ const char WiFiSpiEspCommandProcessor::INVALID_MESSAGE_HEADER[] PROGMEM = "Inval
 const char WiFiSpiEspCommandProcessor::INVALID_MESSAGE_BODY[] PROGMEM = "Invalid message body - message rejected.";
 
 // no assumption about MAX_SOCK_NUM value
-WiFiClient WiFiSpiEspCommandProcessor::clients[MAX_SOCK_NUM];
+WiFiClient *WiFiSpiEspCommandProcessor::clients[MAX_SOCK_NUM];
 WiFiServer *WiFiSpiEspCommandProcessor::servers[MAX_SOCK_NUM];
 WiFiUDP *WiFiSpiEspCommandProcessor::serversUDP[MAX_SOCK_NUM];
 
@@ -190,16 +190,21 @@ void WiFiSpiEspCommandProcessor::processCommand(uint8_t *dataIn) {
  */
 void WiFiSpiEspCommandProcessor::stopServer(uint8_t sock) {
     if (servers[sock] != NULL) {
-        clients[sock].stop();
+        if (clients[sock] != NULL) {
+            clients[sock]->stop();
+
+            delete clients[sock];
+            clients[sock] = NULL;
+        }
         servers[sock]->stop();
         
-        free(servers[sock]);
+        delete servers[sock];
         servers[sock] = NULL;
     }
     else if (serversUDP[sock] != NULL) {
         serversUDP[sock]->stop();
         
-        free(serversUDP[sock]);
+        delete serversUDP[sock];
         serversUDP[sock] = NULL;
     }
 }
@@ -238,6 +243,7 @@ uint8_t WiFiSpiEspCommandProcessor::disconnect() {
 void WiFiSpiEspCommandProcessor::init() {
     // Server array initialization
     for (uint8_t sock=0;  sock<MAX_SOCK_NUM; ++sock) {
+        clients[sock] = NULL;
         servers[sock] = NULL;
         serversUDP[sock] = NULL;
     }
