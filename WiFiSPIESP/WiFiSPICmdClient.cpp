@@ -65,7 +65,7 @@ void WiFiSpiEspCommandProcessor::cmdStartClientTcp() {
     #endif
 
     uint8_t status = 0;
-    if (clients[sock] != NULL) {
+    if (clients[sock] != nullptr) {
         clients[sock]->stop();
         delete clients[sock];
     }
@@ -95,20 +95,20 @@ void WiFiSpiEspCommandProcessor::cmdGetClientStateTcp() {
         return;  // Invalid socket number
     
     uint8_t status = 0;
-    if (clients[sock] != NULL)
+    if (clients[sock] != nullptr)
         status = clients[sock]->connected();  // 1 = connected
 
     // Is it a call of a closed client created in a server connection? 
     // Check if the server has connection
-    if (! status && servers[sock] != NULL) {
-        if (clients[sock] != NULL) {
+    if (! status && servers[sock] != nullptr) {
+        if (clients[sock] != nullptr) {
             clients[sock]->stop();
 
             delete clients[sock];
-            clients[sock] = NULL;
+            clients[sock] = nullptr;
         }
 
-        WiFiClient client = servers[sock]->available(NULL);
+        WiFiClient client = servers[sock]->available(nullptr);
         status = client.connected();  // 1 = connected
         if (status) {
             clients[sock] = new WiFiClient(client);  // make a new client only when connected
@@ -138,8 +138,8 @@ void WiFiSpiEspCommandProcessor::cmdAvailDataTcp() {
 
     int16_t avail = 0;
     
-    if (serversUDP[sock] == NULL)
-        if (clients[sock] != NULL)
+    if (serversUDP[sock] == nullptr)
+        if (clients[sock] != nullptr)
             avail = clients[sock]->available();  // TCP
     else
         avail = serversUDP[sock]->available();  // UDP 
@@ -184,7 +184,7 @@ void WiFiSpiEspCommandProcessor::cmdSendDataTcp() {
 
     // Allocate a buffer
     uint8_t* buffer = static_cast<uint8_t*>(malloc(len));
-    if (buffer == NULL) {
+    if (buffer == nullptr) {
         #ifdef _DEBUG
             Serial.printf("Malloc (%d) failed.\n", len);
         #endif
@@ -207,7 +207,7 @@ void WiFiSpiEspCommandProcessor::cmdSendDataTcp() {
         *buf++ = b;
     }
 
-    if (clients[sock] != NULL)
+    if (clients[sock] != nullptr)
         len = clients[sock]->write(static_cast<const uint8_t*>(buffer), len);
     else
         len = 0;
@@ -239,8 +239,8 @@ void WiFiSpiEspCommandProcessor::cmdGetDataTcp() {
     int16_t reply = -1;
     int16_t avail = 0;
 
-    if (serversUDP[sock] == NULL)
-        if (clients[sock] != NULL)
+    if (serversUDP[sock] == nullptr)
+        if (clients[sock] != nullptr)
             avail = clients[sock]->available();  // TCP
     else
         avail = serversUDP[sock]->available();  // UDP 
@@ -249,12 +249,12 @@ void WiFiSpiEspCommandProcessor::cmdGetDataTcp() {
         // Read/peek one character
          
         if (peek) {
-            if (serversUDP[sock] == NULL)
+            if (serversUDP[sock] == nullptr)
                 reply = clients[sock]->peek();
             else
                 reply = serversUDP[sock]->peek();
         } else {
-            if (serversUDP[sock] == NULL)
+            if (serversUDP[sock] == nullptr)
                 reply = clients[sock]->read();
             else
                 reply = serversUDP[sock]->read();
@@ -286,7 +286,7 @@ void WiFiSpiEspCommandProcessor::cmdGetDatabufTcp() {
 
     // Allocate a buffer
     uint8_t* buffer = static_cast<uint8_t*>(malloc(len));
-    if (buffer == NULL) {
+    if (buffer == nullptr) {
         #ifdef _DEBUG
             Serial.printf("Malloc (%d) failed.\n", len);
         #endif
@@ -294,8 +294,8 @@ void WiFiSpiEspCommandProcessor::cmdGetDatabufTcp() {
     }
 
     // Read the data into the buffer
-    if (serversUDP[sock] == NULL)
-        if (clients[sock] != NULL)
+    if (serversUDP[sock] == nullptr)
+        if (clients[sock] != nullptr)
             len = clients[sock]->read(buffer, len);
         else
             len = 0;  // no data
@@ -325,11 +325,11 @@ void WiFiSpiEspCommandProcessor::cmdStopClientTcp() {
     if (sock >= MAX_SOCK_NUM)
         return;  // Invalid socket number
     
-    if (clients[sock] != NULL) {
+    if (clients[sock] != nullptr) {
         clients[sock]->stop();
 
         delete clients[sock];
-        clients[sock] = NULL;
+        clients[sock] = nullptr;
     }
 
     uint8_t status = 0;

@@ -64,7 +64,7 @@ void WiFiSpiEspCommandProcessor::cmdBeginUdpPacket() {
     
     uint8_t status;
     
-    if (serversUDP[sock] != NULL)
+    if (serversUDP[sock] != nullptr)
         status = serversUDP[sock]->beginPacket(IPAddress(ipAddr), port);
     else
         status = 0;
@@ -105,7 +105,7 @@ void WiFiSpiEspCommandProcessor::cmdInsertDatabuf() {
 
     // Allocate a buffer
     uint8_t* buffer = static_cast<uint8_t*>(malloc(len));
-    if (buffer == NULL) {
+    if (buffer == nullptr) {
         #ifdef _DEBUG
             Serial.printf("Malloc (%d) failed.\n", len);
         #endif
@@ -128,7 +128,7 @@ void WiFiSpiEspCommandProcessor::cmdInsertDatabuf() {
         *buf++ = b;
     }
 
-    if (serversUDP[sock] != NULL)
+    if (serversUDP[sock] != nullptr)
         len = serversUDP[sock]->write(static_cast<const uint8_t*>(buffer), len);
     else
         len = 0;
@@ -158,7 +158,7 @@ void WiFiSpiEspCommandProcessor::cmdSendDataUdp() {
 
     uint8_t status;
     
-    if (serversUDP[sock] != NULL)
+    if (serversUDP[sock] != nullptr)
         status = serversUDP[sock]->endPacket();
     else
         status = 0;
@@ -186,7 +186,7 @@ void WiFiSpiEspCommandProcessor::cmdUdpParsePacket() {
 
     int16_t avail;
     
-    if (serversUDP[sock] != NULL)
+    if (serversUDP[sock] != nullptr)
         avail = serversUDP[sock]->parsePacket();
     else
         avail = 0;

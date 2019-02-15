@@ -97,7 +97,7 @@ void WiFiSpiEspCommandProcessor::cmdGetStateTcp() {
 
     uint8_t status;
     
-    if (servers[sock] == NULL)
+    if (servers[sock] == nullptr)
         status = CLOSED;
     else
         status = servers[sock]->status();
@@ -148,10 +148,10 @@ void WiFiSpiEspCommandProcessor::cmdGetRemoteDataCmd() {
     uint32_t ipAddr = 0;
     uint16_t port = 0;
     
-    if (serversUDP[sock] != NULL) {
+    if (serversUDP[sock] != nullptr) {
         ipAddr = serversUDP[sock]->remoteIP();  // UDP connection
         port = serversUDP[sock]->remotePort();
-    } else if (clients[sock] != NULL) {
+    } else if (clients[sock] != nullptr) {
         ipAddr = clients[sock]->remoteIP();  // TCP connection (server or client)
         port = clients[sock]->remotePort();
     }

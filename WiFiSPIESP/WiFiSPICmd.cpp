@@ -189,23 +189,23 @@ void WiFiSpiEspCommandProcessor::processCommand(uint8_t *dataIn) {
     Frees server from memory and nulls server pointer.
  */
 void WiFiSpiEspCommandProcessor::stopServer(uint8_t sock) {
-    if (servers[sock] != NULL) {
-        if (clients[sock] != NULL) {
+    if (servers[sock] != nullptr) {
+        if (clients[sock] != nullptr) {
             clients[sock]->stop();
 
             delete clients[sock];
-            clients[sock] = NULL;
+            clients[sock] = nullptr;
         }
         servers[sock]->stop();
         
         delete servers[sock];
-        servers[sock] = NULL;
+        servers[sock] = nullptr;
     }
-    else if (serversUDP[sock] != NULL) {
+    else if (serversUDP[sock] != nullptr) {
         serversUDP[sock]->stop();
         
         delete serversUDP[sock];
-        serversUDP[sock] = NULL;
+        serversUDP[sock] = nullptr;
     }
 }
 
@@ -243,9 +243,9 @@ uint8_t WiFiSpiEspCommandProcessor::disconnect() {
 void WiFiSpiEspCommandProcessor::init() {
     // Server array initialization
     for (uint8_t sock=0;  sock<MAX_SOCK_NUM; ++sock) {
-        clients[sock] = NULL;
-        servers[sock] = NULL;
-        serversUDP[sock] = NULL;
+        clients[sock] = nullptr;
+        servers[sock] = nullptr;
+        serversUDP[sock] = nullptr;
     }
 }
 
