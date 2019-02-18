@@ -21,6 +21,7 @@
 #include "WiFiSPICmd.h"
 #include "SPICalls.h"
 #include <ESP8266WiFi.h>
+#include <WiFiClientSecureAxTLS.h>
 
 /*
  * 
@@ -37,7 +38,7 @@ void WiFiSpiEspCommandProcessor::cmdStartClientTcp() {
     int32_t ipAddr;
     uint16_t port;
     uint8_t sock;
-    uint8_t protocol;  // only TCP
+    uint8_t protocol;  // TCP_MODE or TCP_MODE_WITH_TLS
 
     uint8_t dataPos = 4;  // Position in the input buffer
 
@@ -61,7 +62,8 @@ void WiFiSpiEspCommandProcessor::cmdStartClientTcp() {
     setTxStatus(SPISLAVE_TX_PREPARING_DATA);
     
     #ifdef _DEBUG
-        Serial.printf("WifiClient.connect, sock=%d, ip=%s, port=%d\n", sock, IPAddress(ipAddr).toString().c_str(), port);
+        Serial.printf("WifiClient.connect, sock=%d, ip=%s, port=%d, proto=%d\n", sock, 
+            IPAddress(ipAddr).toString().c_str(), port, protocol);
     #endif
 
     uint8_t status = 0;
@@ -70,7 +72,12 @@ void WiFiSpiEspCommandProcessor::cmdStartClientTcp() {
         delete clients[sock];
     }
 
-    clients[sock] = new WiFiClient();
+    if (protocol == TCP_MODE_WITH_TLS)
+        clients[sock] = new WiFiClientSecure();
+    else
+        clients[sock] = new WiFiClient();
+    clientsProto[sock] = protocol;
+
     status = clients[sock]->connect(IPAddress(ipAddr), port);
 
     replyStart(cmd, 1);
@@ -106,6 +113,7 @@ void WiFiSpiEspCommandProcessor::cmdGetClientStateTcp() {
 
             delete clients[sock];
             clients[sock] = nullptr;
+            clientsProto[sock] = -1;
         }
 
         WiFiClient client = servers[sock]->available(nullptr);
@@ -330,6 +338,7 @@ void WiFiSpiEspCommandProcessor::cmdStopClientTcp() {
 
         delete clients[sock];
         clients[sock] = nullptr;
+        clientsProto[sock] = -1;
     }
 
     uint8_t status = 0;
@@ -338,3 +347,69 @@ void WiFiSpiEspCommandProcessor::cmdStopClientTcp() {
     replyEnd();
 }    
 
+/*
+ *  Verifies server TLS certificate against a fingerprint and a host name.
+ *  Works only on SSL Clinet connection. 
+ */
+void WiFiSpiEspCommandProcessor::cmdVerifySSLClient() {
+    uint8_t cmd = data[2];
+    
+    // Get and test the parameters (3 input parameters)
+    if (data[3] != 3) {
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
+        return;  // Failure - received invalid message
+    }
+
+    uint8_t sock;
+    char hostName[81];
+    uint8_t fingerprint[20];  // SHA1 value
+
+    uint8_t dataPos = 4;  // Position in the input buffer
+
+    // Read parameters
+    if (getParameter(data, dataPos, fingerprint, sizeof(fingerprint)) != sizeof(fingerprint))
+        return;  // Failure - received invalid parameter
+    if (getParameterString(data, dataPos, hostName, sizeof(hostName)-1) <= 0)  // domain name
+        return;  // Failure - received invalid parameter
+    if (getParameter(data, dataPos, &sock, sizeof(sock)) < 0)
+        return;  // Failure - received invalid parameter
+    if (sock >= MAX_SOCK_NUM)
+        return;  // Invalid socket number
+    
+    if (data[dataPos] != END_CMD) {
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
+        return;  // Failure - received invalid message
+    }
+
+    #ifdef _DEBUG
+        Serial.printf("WifiClient.verify, sock=%d, host=%s\n", sock, hostName);
+        for (int i=0; i<20; ++i)
+            Serial.printf("%02x ", fingerprint[i]);
+        Serial.println();
+    #endif
+
+    // Check the client
+    uint8_t status = 0;
+    if (clients[sock] != nullptr && clientsProto[sock] == TCP_MODE_WITH_TLS) {
+        if (clients[sock]->connected() == 1) {
+            char strFingerprint[61];
+            char *s = strFingerprint;
+            for (int i = 0; i < 20; ++i) {
+                sprintf(s, "%02x ", fingerprint[i]);
+                s += 3;
+            }
+            *(s-1) = 0;  // String termination
+
+            bool b = reinterpret_cast<WiFiClientSecure*>(clients[sock])->verify(strFingerprint, hostName);
+    #ifdef _DEBUG
+            Serial.printf("Verify: %d\n", b);
+    #endif
+            if (b)
+                status = 1;
+        }
+    }
+
+    replyStart(cmd, 1);
+    replyParam(&status, 1);
+    replyEnd();
+}

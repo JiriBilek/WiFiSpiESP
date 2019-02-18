@@ -7,6 +7,10 @@ The application implements custom SPI protocol on HSPI interface of ESP8266 modu
 
 ## News
 
+#### 2019-02-18
+
+Added SSL Client connection using the AxTLS library. Added verifySSL function that verifies server certificate (SHA1 fingerprint and domain name).
+
 #### 2019-01-27
 
 Enhanced communications protocol (added CRC-8 and confirmation of message reception). Shortened the status message from 4 bytes to 2 bytes and added XOR check. The protocol version is now 0.2.0 and is incompatible with the former one.
@@ -54,7 +58,7 @@ The installation process is described on [esp8266/arduino](https://github.com/es
  
 ### Compiling and flashing
 
-Don't forget to change the board values in the Arduino environment (menu Tools - Board and next).
+Don't forget to change the board values in the Arduino environment (menu Tools - Board and next). The application runs fine on minimum setup (512K, no SPIFFS).
 For flashing you will need to connect the USB to Serial converter to Rx and Tx pins and put CH_PD high (3.3V) and GPIO15 low (GND).
 Put GPIO0 low (GND) and reset the chip just before flashing begins. This is a standard procedure and you can find details anywhere on the Internet.
 If you are using modules with USB connection (NodeMCU, e.g.), all you have to do is to connect the module to your USB port. 

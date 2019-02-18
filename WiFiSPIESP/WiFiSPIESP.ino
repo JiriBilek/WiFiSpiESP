@@ -43,6 +43,8 @@
   0.1.4 31.10.18 JB  Fixed bad timing of MISO signal - delayed by 1/2 clock cycle
   0.2.0 01.02.19 JB  New communication protocol, more changes
   0.2.1 06.02.19 GYC  WifiManager: added LED blinking
+  0.2.2 15.02.19 JB  Dynamically allocated clients, changed NULL to nullptr
+  0.2.3 17.02.19 JB  Added SSL Client option using AxTLS, added function VerifySSLClient, protocol 0.2.3
  */
 
 // This define adds WifiManager to the project (optional) (see https://github.com/tzapu/WiFiManager)
@@ -60,9 +62,9 @@
 #endif
 
 // Library version (format a.b.c)
-const char* VERSION = "0.2.2";
+const char* VERSION = "0.2.3";
 // Protocol version (format a.b.c) 
-const char* PROTOCOL_VERSION = "0.2.0";
+const char* PROTOCOL_VERSION = "0.2.3";
 
 const uint8_t SS_ENABLE_PIN = 5;  // PIN for circuit blocking SS to GPIO15 on reset 
 
