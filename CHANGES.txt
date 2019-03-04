@@ -1,3 +1,5 @@
+0.2.3
+  * SSL Client connection, verifySSL function, protocol 0.2.3
 0.2.1
   * Blinking the builtin LED while in WifiManager mode and connecting
   

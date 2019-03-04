@@ -35,7 +35,9 @@ class WiFiSpiEspCommandProcessor {
         // Private constant strings
         static const char INVALID_MESSAGE_HEADER[] PROGMEM;  // "Invalid message header - message rejected."
         static const char INVALID_MESSAGE_BODY[] PROGMEM;    // "Invalid message body - message rejected."
+
         static WiFiClient *clients[MAX_SOCK_NUM];
+        static int8_t clientsProto[MAX_SOCK_NUM];  // Clients protocols (value of enum tProtMode)
         static WiFiServer *servers[MAX_SOCK_NUM];
         static WiFiUDP *serversUDP[MAX_SOCK_NUM];
 
@@ -77,6 +79,7 @@ class WiFiSpiEspCommandProcessor {
         static void cmdGetDataTcp();
         static void cmdGetDatabufTcp();
         static void cmdStopClientTcp();
+        static void cmdVerifySSLClient();
 
         // WiFiSPICmdServer.cpp
         static void cmdStartServer();
@@ -136,6 +139,7 @@ enum {
   SOFTWARE_RESET_CMD       = 0x3F,
 
   GET_PROTOCOL_VERSION_CMD = 0x50,
+  VERIFY_SSL_CLIENT_CMD    = 0x51,
 
   // All commands with DATA_FLAG 0x40 send a 16bit Len
 
@@ -161,6 +165,10 @@ enum {
 
 
 // Supported protocols
-typedef enum eProtMode {TCP_MODE, UDP_MODE} tProtMode;
+typedef enum eProtMode {
+    TCP_MODE, 
+    UDP_MODE,
+    TCP_MODE_WITH_TLS }
+tProtMode;
 
 #endif

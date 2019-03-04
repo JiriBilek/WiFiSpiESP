@@ -34,6 +34,7 @@ const char WiFiSpiEspCommandProcessor::INVALID_MESSAGE_BODY[] PROGMEM = "Invalid
 WiFiClient *WiFiSpiEspCommandProcessor::clients[MAX_SOCK_NUM];
 WiFiServer *WiFiSpiEspCommandProcessor::servers[MAX_SOCK_NUM];
 WiFiUDP *WiFiSpiEspCommandProcessor::serversUDP[MAX_SOCK_NUM];
+int8_t WiFiSpiEspCommandProcessor::clientsProto[MAX_SOCK_NUM];
 
 
 /*
@@ -149,7 +150,9 @@ void WiFiSpiEspCommandProcessor::processCommand(uint8_t *dataIn) {
         case STOP_CLIENT_TCP_CMD:
             cmdStopClientTcp();  break;
 
-
+        case VERIFY_SSL_CLIENT_CMD:
+            cmdVerifySSLClient();  break;
+            
         // ----- SERVER COMMANDS
     
         case START_SERVER_TCP_CMD:
@@ -244,6 +247,7 @@ void WiFiSpiEspCommandProcessor::init() {
     // Server array initialization
     for (uint8_t sock=0;  sock<MAX_SOCK_NUM; ++sock) {
         clients[sock] = nullptr;
+        clientsProto[sock] = -1;
         servers[sock] = nullptr;
         serversUDP[sock] = nullptr;
     }
