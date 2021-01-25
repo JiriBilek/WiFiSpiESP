@@ -64,8 +64,15 @@ void WiFiSpiEspCommandProcessor::cmdBeginUdpPacket() {
     
     uint8_t status;
     
-    if (serversUDP[sock] != nullptr)
-        status = serversUDP[sock]->beginPacket(IPAddress(ipAddr), port);
+    if (serversUDP[sock] != nullptr) {
+        uint8_t firstByte = ipAddr & 0xff;
+
+        // Check unicast / multicast
+        if (firstByte < 224 || firstByte > 239)
+            status = serversUDP[sock]->beginPacket(IPAddress(ipAddr), port);
+        else
+            status = serversUDP[sock]->beginPacketMulticast(IPAddress(ipAddr), port, WiFi.localIP());
+    }
     else
         status = 0;
 

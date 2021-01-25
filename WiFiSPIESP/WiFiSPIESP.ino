@@ -15,7 +15,7 @@
 
     Device to be compiled for: ESP8266
 
-  Copyright (c) 2017 Jiri Bilek. All rights reserved.
+  Copyright (c) 2017-2021 Jiri Bilek. All rights reserved.
 
   Based on SPISlave example application for ESP8266.
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
@@ -62,7 +62,7 @@
 #endif
 
 // Library version (format a.b.c)
-const char* VERSION = "0.2.3";
+const char* VERSION = "0.2.4";
 // Protocol version (format a.b.c) 
 const char* PROTOCOL_VERSION = "0.2.3";
 
