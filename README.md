@@ -7,6 +7,10 @@ The application implements custom SPI protocol on HSPI interface of ESP8266 modu
 
 ## News
 
+#### 2021-01-25
+
+Added UDP Multicast support.
+
 #### 2019-02-18
 
 Added SSL Client connection using the AxTLS library. Added verifySSL function that verifies server certificate (SHA1 fingerprint and domain name).
