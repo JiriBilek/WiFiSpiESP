@@ -21,7 +21,7 @@
 #include "WiFiSPICmd.h"
 #include "SPICalls.h"
 #include <ESP8266WiFi.h>
-#include <WiFiClientSecureAxTLS.h>
+#include <WiFiClientSecure.h>
 
 /*
  * 
@@ -65,6 +65,9 @@ void WiFiSpiEspCommandProcessor::cmdStartClientTcp() {
         Serial.printf("WifiClient.connect, sock=%d, ip=%s, port=%d, proto=%d\n", sock, 
             IPAddress(ipAddr).toString().c_str(), port, protocol);
     #endif
+#if defined(ESPSPI_MONITOR)
+        Serial.printf("Cli: %s:%d", IPAddress(ipAddr).toString().c_str(), port);
+#endif
 
     uint8_t status = 0;
     if (clients[sock] != nullptr) {
@@ -72,13 +75,21 @@ void WiFiSpiEspCommandProcessor::cmdStartClientTcp() {
         delete clients[sock];
     }
 
-    if (protocol == TCP_MODE_WITH_TLS)
-        clients[sock] = new WiFiClientSecure();
-    else
+    if (protocol == TCP_MODE_WITH_TLS) {
+        WiFiClientSecure *cliPtr = new WiFiClientSecure();
+        cliPtr->setInsecure();  // Very insecure, turns off certificate chain validation!
+        clients[sock] = cliPtr;
+    }
+    else {
         clients[sock] = new WiFiClient();
+    }
     clientsProto[sock] = protocol;
 
     status = clients[sock]->connect(IPAddress(ipAddr), port);
+
+#if defined(ESPSPI_MONITOR)
+        Serial.printf(" -> %d\n", status);
+#endif
 
     replyStart(cmd, 1);
     replyParam(&status, 1);

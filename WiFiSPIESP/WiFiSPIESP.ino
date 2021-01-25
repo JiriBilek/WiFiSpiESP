@@ -199,4 +199,13 @@ void loop() {
     }
     else
         refreshStatus();  // Helps to stabilize the SPI bus after a reset, only ensures the status register value is ok
+
+#if defined(ESPSPI_MONITOR)
+    static uint32_t m = 0;
+    if (millis() - m > 10000) {
+        m = millis();
+        long fh = ESP.getFreeHeap();
+        Serial.printf("Heap: %ld\n", fh);
+    }
+#endif
 }

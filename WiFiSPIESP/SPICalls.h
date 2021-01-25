@@ -31,6 +31,8 @@
 // Prints out received and transmitted messages. Severely slows down the communication!
 //#define _DEBUG_MESSAGES
 
+#define ESPSPI_MONITOR
+
 // Globals
 extern volatile boolean dataReceived;
 extern uint8_t* inputBuffer;
@@ -85,4 +87,3 @@ enum {
 #define MESSAGE_CONTINUES    0xDC
 
 #endif
-

@@ -68,17 +68,21 @@ void WiFiSpiEspCommandProcessor::cmdSetPassphrase() {
         return;  // Failure - received invalid message
     }
 
-    #ifdef _DEBUG
-        Serial.printf("Wifi.begin, ssid=%s\n", ssid);
-    #endif
+#if defined(ESPSPI_MONITOR)
+        Serial.printf("Conn: %s", ssid);
+#endif
 
     if (WiFi.status() == WL_CONNECTED) {
         disconnect();  // Needed, without disconnecting the WiFi.begin fails
     }
     
-    WiFi.mode(WIFI_OFF); 
+    WiFi.mode(WIFI_OFF);
     WiFi.mode(WIFI_STA); 
     uint8_t status = WiFi.begin(ssid, passphrase);
+
+#if defined(ESPSPI_MONITOR)
+        Serial.printf(" -> %d\n", status);
+#endif
 
     replyStart(cmd, 1);
     replyParam(&status, 1);
@@ -269,4 +273,3 @@ void WiFiSpiEspCommandProcessor::cmdGetHostByName() {
     replyParam(ipAddr.bytes, 4);
     replyEnd();
 }
-
