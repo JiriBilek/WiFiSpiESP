@@ -201,9 +201,58 @@ void WiFiSpiEspCommandProcessor::cmdUdpParsePacket() {
     #ifdef _DEBUG
         Serial.printf("ParsePacket[%d] = %d\n", sock, avail);
     #endif
-    
+
     replyStart(cmd, 1);
     replyParam(reinterpret_cast<const uint8_t *>(&avail), sizeof(avail));
     replyEnd();
 }
 
+/*
+ *
+ */
+void WiFiSpiEspCommandProcessor::cmdStartServerMulticast() {
+    uint8_t cmd = data[2];
+    
+    // Get and test the parameters (3 input parameters)
+    if (data[3] != 3) {
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
+        return;  // Failure - received invalid message
+    }
+    uint32_t ipAddr;
+    uint16_t port;
+    uint8_t sock;
+
+    uint8_t dataPos = 4;  // Position in the input buffer
+
+    // Read parameters
+    if (getParameter(data, dataPos, reinterpret_cast<uint8_t*>(&ipAddr), sizeof(ipAddr)) < 0)
+        return;  // Failure - received invalid parameter
+    if (getParameter(data, dataPos, reinterpret_cast<uint8_t*>(&port), sizeof(port)) < 0)
+        return;  // Failure - received invalid parameter
+    if (getParameter(data, dataPos, &sock, sizeof(sock)) < 0)
+        return;  // Failure - received invalid parameter
+    if (sock >= MAX_SOCK_NUM)
+        return;  // Invalid socket number
+    
+    if (data[dataPos] != END_CMD) {
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
+        return;  // Failure - received invalid message
+    }
+
+    #ifdef _DEBUG
+        Serial.printf("WiFiUDP.startServerMulticast, ip=%ld, sock=%d, port=%d\n", ipAddr, sock, port);
+    #endif
+
+    // Close existing server on this socket
+    stopServer(sock);
+
+    // Open
+    uint8_t status;
+    
+    serversUDP[sock] = new WiFiUDP();
+    status = serversUDP[sock]->beginMulticast(WiFi.localIP(), IPAddress(ipAddr), port);
+
+    replyStart(cmd, 1);
+    replyParam(&status, 1);
+    replyEnd();
+}

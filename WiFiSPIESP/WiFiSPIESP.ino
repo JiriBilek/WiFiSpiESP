@@ -45,6 +45,7 @@
   0.2.1 06.02.19 GYC  WifiManager: added LED blinking
   0.2.2 15.02.19 JB  Dynamically allocated clients, changed NULL to nullptr
   0.2.3 17.02.19 JB  Added SSL Client option using AxTLS, added function VerifySSLClient, protocol 0.2.3
+  0.2.4 25.01.21 JB  Added UDP Multicast transmit and receive
  */
 
 // This define adds WifiManager to the project (optional) (see https://github.com/tzapu/WiFiManager)
@@ -64,7 +65,7 @@
 // Library version (format a.b.c)
 const char* VERSION = "0.2.4";
 // Protocol version (format a.b.c) 
-const char* PROTOCOL_VERSION = "0.2.3";
+const char* PROTOCOL_VERSION = "0.2.4";
 
 const uint8_t SS_ENABLE_PIN = 5;  // PIN for circuit blocking SS to GPIO15 on reset 
 

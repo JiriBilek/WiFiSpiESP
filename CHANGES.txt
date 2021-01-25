@@ -1,10 +1,21 @@
-0.2.3
-  * SSL Client connection, verifySSL function, protocol 0.2.3
-0.2.1
-  * Blinking the builtin LED while in WifiManager mode and connecting
-  
-0.2.0
-  * New protocol, several new commands
+0.2.4 (2021-01-25)
+  * Added UDP Multicast transmit and receive
+  * Fixed bug in UDP data transfer
+  * Protocol verison 0.2.4
+
+0.2.3 (2019-02-17)
+  * Added SSL Client option using AxTLS
+  * Added function VerifySSLClient for certificate fingerprint verification
+  * Protocol version 0.2.3
+
+0.2.2 (2019-02-15)
+  * Dynamically allocated clients, changed NULL to nullptr
+
+0.2.1 (2019-02-06)
+  * WifiManager: added LED blinking
+
+0.2.0 (2019-02-01)
+  * New communication protocol, more changes
 
 0.1.4 (2018-01-24)
   * Added protocol versioning

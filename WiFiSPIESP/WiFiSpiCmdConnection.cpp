@@ -21,6 +21,7 @@
 #include "WiFiSPICmd.h"
 #include "SPICalls.h"
 #include <ESP8266WiFi.h>
+#include "user_interface.h"
 
 /*
  * 
@@ -78,6 +79,8 @@ void WiFiSpiEspCommandProcessor::cmdSetPassphrase() {
     
     WiFi.mode(WIFI_OFF); 
     WiFi.mode(WIFI_STA); 
+    wifi_set_sleep_type(NONE_SLEEP_T);
+
     uint8_t status = WiFi.begin(ssid, passphrase);
 
     replyStart(cmd, 1);
