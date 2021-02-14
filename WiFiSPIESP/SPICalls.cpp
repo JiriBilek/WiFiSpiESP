@@ -53,6 +53,8 @@ uint8_t crc8(uint8_t *buffer, uint8_t bufLen);
 void ICACHE_RAM_ATTR SPIOnStatus(uint16_t data) {
     #ifdef _DEBUG_SPICALLS
         Serial.printf("Status: %04x\n", data);
+    #else
+        (void)(data);
     #endif
 }
 
@@ -95,6 +97,7 @@ void ICACHE_RAM_ATTR SPIOnStatusSent() {
   |___________|___________|____________|_________|___________|________|____|_________|
 */
 void ICACHE_RAM_ATTR SPIOnData(uint8_t* data, size_t len) {
+	(void)(len);
 
     // TODO: Fix buffer overwriting when the processing of the buffer is too slow
   
@@ -361,7 +364,7 @@ int8_t getParameter(uint8_t* data, uint8_t &dataPos, uint16_t* param) {
     Ensures there is at least one byte left in the data buffer.
  */
 int8_t getParameterString(uint8_t* data, uint8_t &dataPos, char* param, const uint8_t paramLen) {
-    uint8_t len;
+    int8_t len;
     
     len = getParameter(data, dataPos, reinterpret_cast<uint8_t*>(param), paramLen);
     if (len < 0)
@@ -374,13 +377,9 @@ int8_t getParameterString(uint8_t* data, uint8_t &dataPos, char* param, const ui
 /*
  * Compute crc8 with polynom 0x107 (x^8 + x^2 + x + 1)
  * Lookup table idea: https://lentz.com.au/blog/tag/crc-table-generator
- *
- * INVESTIGATION: Doesn't the crc computing take too long to be processed in interrupt handler?
  */
 uint8_t ICACHE_RAM_ATTR crc8(uint8_t *buffer, uint8_t bufLen)
 {
-    const static uint8_t POLY = 0x07;
-
     static const uint8_t PROGMEM tableLow[] = { 0x00, 0x07, 0x0E, 0x09, 0x1C, 0x1B, 0x12, 0x15, 
                                                 0x38, 0x3F, 0x36, 0x31, 0x24, 0x23, 0x2A, 0x2D };
     static const uint8_t PROGMEM tableHigh[] = { 0x00, 0x70, 0xE0, 0x90, 0xC7, 0xB7, 0x27, 0x57,

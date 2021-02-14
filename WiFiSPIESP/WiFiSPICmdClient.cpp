@@ -157,11 +157,13 @@ void WiFiSpiEspCommandProcessor::cmdAvailDataTcp() {
 
     int16_t avail = 0;
     
-    if (serversUDP[sock] == nullptr)
+    if (serversUDP[sock] == nullptr) {
         if (clients[sock] != nullptr)
             avail = clients[sock]->available();  // TCP
-    else
+    }
+    else {
         avail = serversUDP[sock]->available();  // UDP 
+    }
 
     #ifdef _DEBUG
         Serial.printf("Avail[%d] = %d\n", sock, avail);
@@ -258,9 +260,10 @@ void WiFiSpiEspCommandProcessor::cmdGetDataTcp() {
     int16_t reply = -1;
     int16_t avail = 0;
 
-    if (serversUDP[sock] == nullptr)
+    if (serversUDP[sock] == nullptr) {
         if (clients[sock] != nullptr)
             avail = clients[sock]->available();  // TCP
+    }
     else
         avail = serversUDP[sock]->available();  // UDP 
 
@@ -313,11 +316,12 @@ void WiFiSpiEspCommandProcessor::cmdGetDatabufTcp() {
     }
 
     // Read the data into the buffer
-    if (serversUDP[sock] == nullptr)
+    if (serversUDP[sock] == nullptr) {
         if (clients[sock] != nullptr)
             len = clients[sock]->read(buffer, len);
         else
             len = 0;  // no data
+    }
     else
         len = serversUDP[sock]->read(buffer, len);
 
