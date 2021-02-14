@@ -96,7 +96,7 @@ void WiFiSpiEspCommandProcessor::cmdSetIpConfig() {
         return;  // Failure - received invalid message
     }
     
-    Serial.printf("Wifi.config, local_ip=%lx, gateway=%lx, subnet=%lx, dns_server1=%lx, dns_server2=%lx\n", local_ip, gateway, subnet, dns_server1, dns_server2);
+    Serial.printf("Wifi.config, local_ip=%x, gateway=%x, subnet=%x, dns_server1=%x, dns_server2=%x\n", local_ip, gateway, subnet, dns_server1, dns_server2);
 
     uint8_t status = WiFi.config(local_ip, gateway, subnet, dns_server1, dns_server2);
 
