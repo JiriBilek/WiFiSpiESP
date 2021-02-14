@@ -77,7 +77,13 @@ void WiFiSpiEspCommandProcessor::cmdStartClientTcp() {
 
     if (protocol == TCP_MODE_WITH_TLS) {
         WiFiClientSecure *cliPtr = new WiFiClientSecure();
-        cliPtr->setInsecure();  // Very insecure, turns off certificate chain validation!
+
+        // Security settings
+        if (useSSLFingerprint)
+        	cliPtr->setFingerprint(SSLFingerprint);
+        else
+        	cliPtr->setInsecure();  // Very insecure, turns off certificate chain validation!
+
         clients[sock] = cliPtr;
     }
     else {
@@ -396,33 +402,9 @@ void WiFiSpiEspCommandProcessor::cmdVerifySSLClient() {
         return;  // Failure - received invalid message
     }
 
-    #ifdef _DEBUG
-        Serial.printf("WifiClient.verify, sock=%d, host=%s\n", sock, hostName);
-        for (int i=0; i<20; ++i)
-            Serial.printf("%02x ", fingerprint[i]);
-        Serial.println();
-    #endif
-
-    // Check the client
+    // Return error condition:
+    // BearSSL does not provide method for ex-post testing of the SSL fingerprint
     uint8_t status = 0;
-    if (clients[sock] != nullptr && clientsProto[sock] == TCP_MODE_WITH_TLS) {
-        if (clients[sock]->connected() == 1) {
-            char strFingerprint[61];
-            char *s = strFingerprint;
-            for (int i = 0; i < 20; ++i) {
-                sprintf(s, "%02x ", fingerprint[i]);
-                s += 3;
-            }
-            *(s-1) = 0;  // String termination
-
-            bool b = reinterpret_cast<WiFiClientSecure*>(clients[sock])->verify(strFingerprint, hostName);
-    #ifdef _DEBUG
-            Serial.printf("Verify: %d\n", b);
-    #endif
-            if (b)
-                status = 1;
-        }
-    }
 
     replyStart(cmd, 1);
     replyParam(&status, 1);

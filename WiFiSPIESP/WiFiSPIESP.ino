@@ -63,9 +63,9 @@
 #endif
 
 // Library version (format a.b.c)
-const char* VERSION = "0.2.4";
+const char* VERSION = "0.2.5";
 // Protocol version (format a.b.c) 
-const char* PROTOCOL_VERSION = "0.2.4";
+const char* PROTOCOL_VERSION = "0.2.5";
 
 const uint8_t SS_ENABLE_PIN = 5;  // PIN for circuit blocking SS to GPIO15 on reset 
 
