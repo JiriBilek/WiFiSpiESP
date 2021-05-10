@@ -7,6 +7,10 @@ The application implements custom SPI protocol on HSPI interface of ESP8266 modu
 
 ## News
 
+#### 2021-05-10 BREAKING
+
+The newest esp8266/Arduino repository code (SDK:2.2.2-dev(38a443e)/Core:unix-3.0.0-dev=-300000/lwIP:STABLE-2_1_2_RELEASE/glue:1.2-48-g7421258/BearSSL:c0b69df) seems to break the app. Until I fix it, please use older esp8266/Arduino releases. 
+
 #### 2021-01-25
 
 Added UDP Multicast support.
