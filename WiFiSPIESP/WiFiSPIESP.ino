@@ -47,6 +47,7 @@
   0.2.3 17.02.19 JB  Added SSL Client option using AxTLS, added function VerifySSLClient, protocol 0.2.3
   0.2.4 25.01.21 JB  Added UDP Multicast transmit and receive
   0.2.5 14.02.21 JB  Added SET_SSL_FINGERPRINT_CMD command, protocol 0.2.5
+  0.3.0 13.05.21 JB  Advanced the version and protocol to 0.3.0
  */
 
 // This define adds WifiManager to the project (optional) (see https://github.com/tzapu/WiFiManager)
@@ -64,9 +65,9 @@
 #endif
 
 // Library version (format a.b.c)
-const char* VERSION = "0.2.5";
+const char* VERSION = "0.3.0";
 // Protocol version (format a.b.c) 
-const char* PROTOCOL_VERSION = "0.2.5";
+const char* PROTOCOL_VERSION = "0.3.0";
 
 const uint8_t SS_ENABLE_PIN = 5;  // PIN for circuit blocking SS to GPIO15 on reset 
 
