@@ -46,6 +46,7 @@
   0.2.2 15.02.19 JB  Dynamically allocated clients, changed NULL to nullptr
   0.2.3 17.02.19 JB  Added SSL Client option using AxTLS, added function VerifySSLClient, protocol 0.2.3
   0.2.4 25.01.21 JB  Added UDP Multicast transmit and receive
+  0.2.5 14.02.21 JB  Added SET_SSL_FINGERPRINT_CMD command, protocol 0.2.5
  */
 
 // This define adds WifiManager to the project (optional) (see https://github.com/tzapu/WiFiManager)
