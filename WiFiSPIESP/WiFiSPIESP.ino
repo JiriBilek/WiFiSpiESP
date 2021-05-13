@@ -46,6 +46,7 @@
   0.2.2 15.02.19 JB  Dynamically allocated clients, changed NULL to nullptr
   0.2.3 17.02.19 JB  Added SSL Client option using AxTLS, added function VerifySSLClient, protocol 0.2.3
   0.2.4 25.01.21 JB  Added UDP Multicast transmit and receive
+  0.2.5 14.02.21 JB  Added SET_SSL_FINGERPRINT_CMD command, protocol 0.2.5
  */
 
 // This define adds WifiManager to the project (optional) (see https://github.com/tzapu/WiFiManager)
@@ -63,9 +64,9 @@
 #endif
 
 // Library version (format a.b.c)
-const char* VERSION = "0.2.4";
+const char* VERSION = "0.2.5";
 // Protocol version (format a.b.c) 
-const char* PROTOCOL_VERSION = "0.2.4";
+const char* PROTOCOL_VERSION = "0.2.5";
 
 const uint8_t SS_ENABLE_PIN = 5;  // PIN for circuit blocking SS to GPIO15 on reset 
 
@@ -200,4 +201,13 @@ void loop() {
     }
     else
         refreshStatus();  // Helps to stabilize the SPI bus after a reset, only ensures the status register value is ok
+
+#if defined(ESPSPI_MONITOR)
+    static uint32_t m = 0;
+    if (millis() - m > 10000) {
+        m = millis();
+        long fh = ESP.getFreeHeap();
+        Serial.printf("Heap: %ld\n", fh);
+    }
+#endif
 }

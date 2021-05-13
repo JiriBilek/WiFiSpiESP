@@ -68,18 +68,21 @@ void WiFiSpiEspCommandProcessor::cmdSetPassphrase() {
         return;  // Failure - received invalid message
     }
 
-    #ifdef _DEBUG
-        Serial.printf("Wifi.begin, ssid=%s\n", ssid);
-    #endif
+#if defined(ESPSPI_MONITOR)
+        Serial.printf("Conn: %s", ssid);
+#endif
 
     if (WiFi.status() == WL_CONNECTED) {
         disconnect();  // Needed, without disconnecting the WiFi.begin fails
     }
     
-    WiFi.mode(WIFI_OFF); 
+    WiFi.mode(WIFI_OFF);
     WiFi.mode(WIFI_STA); 
-
     uint8_t status = WiFi.begin(ssid, passphrase);
+
+#if defined(ESPSPI_MONITOR)
+        Serial.printf(" -> %d\n", status);
+#endif
 
     replyStart(cmd, 1);
     replyParam(&status, 1);
@@ -271,3 +274,59 @@ void WiFiSpiEspCommandProcessor::cmdGetHostByName() {
     replyEnd();
 }
 
+void WiFiSpiEspCommandProcessor::cmdSetSSLFingerprint()
+{
+    uint8_t cmd = data[2];
+
+    // Get and test the parameters (0 or 1 input parameter)
+    // No input - disable the fingerprint validation
+    // 1 input parameter - set fingerprint value and enable the validation
+    if (data[3] != 0 && data[3] != 1) {
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
+        return;  // Failure - received invalid message
+    }
+
+    uint8_t fingerprint[20];  // SHA1 value
+
+    uint8_t dataPos = 4;  // Position in the input buffer
+
+    if (data[3] == 1)
+    {
+		// Read parameter
+		if (getParameter(data, dataPos, fingerprint, sizeof(fingerprint)) != sizeof(fingerprint))
+			return;  // Failure - received invalid parameter
+    }
+
+    if (data[dataPos] != END_CMD) {
+        Serial.println(FPSTR(INVALID_MESSAGE_BODY));
+        return;  // Failure - received invalid message
+    }
+
+    if (data[3] == 1)
+    {
+		// Set the global SSL fingerprint value
+		memcpy(SSLFingerprint, fingerprint, 20);
+		useSSLFingerprint = true;
+    }
+    else
+		useSSLFingerprint = false;
+
+#ifdef _DEBUG
+    Serial.print("SetSSLFingerprint: ");
+    if (data[3] == 1)
+    {
+		for (int i=0; i<20; ++i)
+			Serial.printf("%02x ", SSLFingerprint[i]);
+		Serial.println();
+    }
+    else
+    	Serial.println("disabled");
+#endif
+
+    // Return success
+    uint8_t status = 1;
+
+    replyStart(cmd, 1);
+    replyParam(&status, 1);
+    replyEnd();
+}

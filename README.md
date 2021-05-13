@@ -1,4 +1,4 @@
-WiFiESPSpi
+WiFiSpiESP
 ==========
 
 This application is intended to run on ESP8266 module with accessible HSPI interface (e.g. ESP-12).
@@ -6,6 +6,12 @@ This application is intended to run on ESP8266 module with accessible HSPI inter
 The application implements custom SPI protocol on HSPI interface of ESP8266 module and enables to use it as a dedicated WiFi slave device - see below. The SPI interface is used because of its strictly master/slave nature.
 
 ## News
+
+#### 2021-05-13
+
+The newest esp8266/Arduino repository code breaks the app. The problem is in the enum *wl_status_t* in *wl_definitons.h* file. The enum has to be the same both in master and slave code. Unfortunately, this enum changed in time in esp8266/Arduino repository. Until a new esp8266/Arduino release comes, you have to use [release 2.7.4](https://github.com/esp8266/Arduino/releases/tag/2.7.4)
+
+If you are really into using the bleeding edge esp8266/Arduino repo, go to WiFiSpi library and change the *wl_status_t* in *wl_definitons.h* file according to the esp8266 repo.
 
 #### 2021-01-25
 
@@ -69,7 +75,6 @@ If you are using modules with USB connection (NodeMCU, e.g.), all you have to do
  
 ## ToDo and Wish Lists
 
-- TLS connection
 - SPI protocol optimization
 
 ## Credits

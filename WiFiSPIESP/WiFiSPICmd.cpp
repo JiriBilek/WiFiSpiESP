@@ -36,6 +36,9 @@ WiFiServer *WiFiSpiEspCommandProcessor::servers[MAX_SOCK_NUM];
 WiFiUDP *WiFiSpiEspCommandProcessor::serversUDP[MAX_SOCK_NUM];
 int8_t WiFiSpiEspCommandProcessor::clientsProto[MAX_SOCK_NUM];
 
+// SSL security data
+uint8_t WiFiSpiEspCommandProcessor::SSLFingerprint[20];  // SSL certificate fingerprint
+bool WiFiSpiEspCommandProcessor::useSSLFingerprint = false;
 
 /*
     Processes the input buffer for a command.
@@ -126,6 +129,8 @@ void WiFiSpiEspCommandProcessor::processCommand(uint8_t *dataIn) {
         case GET_HOST_BY_NAME_CMD:
             cmdGetHostByName();  break;
 
+        case SET_SSL_FINGERPRINT_CMD:
+        	cmdSetSSLFingerprint();  break;
 
         // ----- CLIENT COMMANDS
     

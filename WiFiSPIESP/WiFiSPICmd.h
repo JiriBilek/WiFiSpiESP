@@ -41,6 +41,9 @@ class WiFiSpiEspCommandProcessor {
         static WiFiServer *servers[MAX_SOCK_NUM];
         static WiFiUDP *serversUDP[MAX_SOCK_NUM];
 
+        // SSL security data
+        static uint8_t SSLFingerprint[20];  // SSL certificate fingerprint
+        static bool useSSLFingerprint;
 
     public:
         static void init();
@@ -70,6 +73,7 @@ class WiFiSpiEspCommandProcessor {
         static void cmdGetCurrRssi();
         static void cmdGetCurrBssid();
         static void cmdGetHostByName();
+        static void cmdSetSSLFingerprint();
 
         // WiFiSPICmdClient.cpp
         static void cmdStartClientTcp();
@@ -142,6 +146,7 @@ enum {
   GET_PROTOCOL_VERSION_CMD = 0x50,
   VERIFY_SSL_CLIENT_CMD    = 0x51,
   START_SERVER_MULTICAST_CMD = 0x52,
+  SET_SSL_FINGERPRINT_CMD = 0x53,
 
   // All commands with DATA_FLAG 0x40 send a 16bit Len
 
