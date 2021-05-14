@@ -157,7 +157,7 @@ void WiFiSpiEspCommandProcessor::cmdGetRemoteDataCmd() {
     }
 
     #ifdef _DEBUG
-        Serial.printf("%d: IP=%lx, port=%d\n", sock, ipAddr, port);
+        Serial.printf("%d: IP=%x, port=%d\n", sock, ipAddr, port);
     #endif
 
     replyStart(cmd, 2);

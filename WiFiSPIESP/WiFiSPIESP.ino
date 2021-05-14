@@ -108,7 +108,7 @@ void setup()
     // Serial line for debugging
     Serial.begin(115200);
 
-#ifdef _DEBUG    // _DEBUG can be enabled in SPISlave.h
+#ifdef _DEBUG    // _DEBUG can be enabled in SPICalls.h
     Serial.setDebugOutput(true);
 #endif
 

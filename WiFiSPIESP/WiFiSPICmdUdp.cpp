@@ -240,7 +240,7 @@ void WiFiSpiEspCommandProcessor::cmdStartServerMulticast() {
     }
 
     #ifdef _DEBUG
-        Serial.printf("WiFiUDP.startServerMulticast, ip=%ld, sock=%d, port=%d\n", ipAddr, sock, port);
+        Serial.printf("WiFiUDP.startServerMulticast, ip=%d, sock=%d, port=%d\n", ipAddr, sock, port);
     #endif
 
     // Close existing server on this socket
